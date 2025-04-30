@@ -4,6 +4,6 @@ Aplicación web desarrollada con tecnologías web y Machine Learning para promov
 
 ## 👥 Integrantes del Proyecto
 
-- **Belito Ramírez Mori Octavio**
-- **Javier Daniel Coronel Burgos**
-- **Cielo Alessandra Torres Aguilar**
+- **Belito Ramírez, Mori Octavio**
+- **Coronel Burgos, Javier Daniel**
+- **Torres Aguilar, Cielo Alessandra**
