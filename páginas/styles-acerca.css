@@ -1,0 +1,136 @@
+/* Reset de márgenes y paddings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Estilo global */
+body {
+    background-color: #1c1c1c;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+}
+
+/* Estilo del header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background-color: rgba(0, 0, 0, 0.6);
+}
+
+header .logo {
+    font-size: 28px;
+    font-weight: bold;
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+}
+
+nav ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    transition: color 0.3s;
+}
+
+nav ul li a:hover {
+    color: orange;
+}
+
+/* Estilo de la introducción */
+.intro-section {
+    text-align: center;
+    margin: 40px 0;
+}
+
+.title {
+    font-size: 36px;
+    color: orange;
+    margin-bottom: 20px;
+}
+
+.intro-text {
+    font-size: 18px;
+    line-height: 1.6;
+    margin-top: 20px;
+    padding: 0 20px;
+}
+
+/* Estilo de los destinos */
+.destinos-section {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    margin-top: 40px;
+}
+
+.destino-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.destino-card.left {
+    flex-direction: row;
+}
+
+.destino-card.right {
+    flex-direction: row-reverse;
+}
+
+.destino-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.image-container {
+    width: 40%;
+    overflow: hidden;
+}
+
+.destino-card img {
+    width: 100%;
+    height: auto;  /* Ajusta la imagen para que se vea completa */
+    object-fit: cover;
+}
+
+.card-content {
+    padding: 20px;
+    width: 60%;
+}
+
+.card-content h3 {
+    font-size: 24px;
+    color: orange;
+    margin-bottom: 15px;
+}
+
+.card-content p {
+    font-size: 18px;
+    line-height: 1.6;
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: rgba(0, 0, 0, 0.6);
+    margin-top: 40px;
+    border-radius: 8px;
+}
+
+footer p {
+    font-size: 16px;
+    color: white;
+}

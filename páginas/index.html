@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Web Turismo</title>
+    <link rel="stylesheet" href="styles-login.css" />
+</head>
+<body>
+    <header>
+        <div class="logo">Turismo</div>
+        <nav>
+            <ul>
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="turismo.html">Lugares</a></li>
+                <li><a href="acerca.html">Acerca</a></li>
+                <li><a href="contacto.html">Contacto</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <div class="hero-text">
+            <h1>Bienvenidos a la aventura</h1>
+            <p>Explora los mejores destinos turísticos de Huancayo</p>
+        </div>
+        <div class="login-form">
+            <h2>Iniciar Sesión</h2>
+            <form id="loginForm">
+                <label for="usuario">Usuario</label>
+                <input type="text" id="usuario" required />
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" required />
+                <button type="submit">Iniciar Sesión</button>
+                <p id="errorMsg" style="color: red; margin-top: 10px;"></p>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Base inicial (solo si no existe aún)
+        const baseUsuarios = {
+            'Mori': '74902137',
+        };
+
+        if (!localStorage.getItem("usuarios")) {
+            localStorage.setItem("usuarios", JSON.stringify(baseUsuarios));
+        }
+
+        const usuarios = JSON.parse(localStorage.getItem("usuarios"));
+
+        document.getElementById("loginForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const usuario = document.getElementById("usuario").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const errorMsg = document.getElementById("errorMsg");
+
+            if (usuarios[usuario] && usuarios[usuario] === password) {
+                localStorage.setItem("usuario", usuario);
+                window.location.href = "principal.html";
+            } else {
+                errorMsg.textContent = "Usuario o contraseña incorrectos.";
+            }
+        });
+    </script>
+
+    <footer>
+        <p>&copy; 2025 Turismo. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>
