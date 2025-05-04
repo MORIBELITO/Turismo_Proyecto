@@ -161,3 +161,36 @@ body::before {
   text-align: center;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.4);
 }
+
+/* Opción Reseñar */
+.review-option {
+  margin-top: 30px; /* Separar un poco de la sección de usuario */
+  width: 100%;
+  text-align: center;
+  display: none; /* Ocultar la opción por defecto */
+}
+
+.sidebar.collapsed .review-option {
+  display: none; /* Asegurarse de que se oculte cuando la barra esté colapsada */
+}
+
+.sidebar:not(.collapsed) .review-option {
+  display: block; /* Mostrar solo cuando la barra no esté colapsada */
+}
+
+.review-option a {
+  display: block;
+  font-size: 24px; /* Tamaño de texto más grande */
+  padding: 10px 0; /* Espaciado superior e inferior */
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+  text-transform: uppercase; /* Convertir a mayúsculas */
+  letter-spacing: 1px; /* Espaciado entre letras */
+  transition: color 0.3s ease, text-shadow 0.3s ease; /* Transición suave para el cambio de color y brillo */
+}
+
+.review-option a:hover {
+  color: #f0f0f0; /* Color al pasar el ratón */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.8), 0 0 20px rgba(255, 255, 255, 0.6), 0 0 30px rgba(255, 255, 255, 0.4); /* Efecto de resplandor */
+}
