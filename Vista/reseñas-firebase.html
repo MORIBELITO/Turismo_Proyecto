@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Reseñas Turísticas</title>
+
+  <!-- Estilos externos -->
+  <link rel="stylesheet" href="css/styles-reseñas.css" />
+
+  <!-- Estilos Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+  <div class="contenedor">
+    <div id="mapa"></div>
+
+    <div class="formulario">
+      <h2>Formulario de Reseña</h2>
+      <form id="formResena">
+        <label for="nombreLugar">Lugar:</label>
+        <input type="text" id="nombreLugar" readonly />
+
+        <label for="visitas">Visitas:</label>
+        <input type="number" id="visitas" readonly />
+
+        <label for="accesibles">Lugares accesibles:</label>
+        <input type="number" id="accesibles" readonly />
+
+        <label for="anio">Año:</label>
+        <input type="number" id="anio" readonly />
+
+        <label for="accesibilidad">Accesibilidad:</label>
+        <select id="accesibilidad" required>
+          <option value="">Selecciona</option>
+          <option value="Baja">Baja</option>
+          <option value="Media">Media</option>
+          <option value="Alta">Alta</option>
+        </select>
+
+        <label for="comentario">Comentario:</label>
+        <textarea id="comentario" required minlength="5" placeholder="Escribe tu comentario aquí..."></textarea>
+
+        <button type="submit" id="btnEnviar">Enviar Reseña</button>
+      </form>
+
+      <div id="mensaje" class="mensaje"></div>
+
+      <hr />
+
+      <h3>Reseñas anteriores</h3>
+      <div id="reseñasAnteriores" class="reseñas-anteriores"></div>
+      <button id="btnToggleReseñas" class="btn-toggle-reseñas">Mostrar más</button>
+
+      <h3>Ranking de lugares (según accesibilidad promedio)</h3>
+      <ol id="rankingLugares"></ol>
+    </div>
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <!-- Firebase y lógica JS -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import {
+      getFirestore, collection, addDoc,
+      query, orderBy, onSnapshot
+    } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "TU_API_KEY",
+      authDomain: "turismo-4e958.firebaseapp.com",
+      projectId: "turismo-4e958",
+      storageBucket: "turismo-4e958.appspot.com",
+      messagingSenderId: "TU_MESSAGING_ID",
+      appId: "TU_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const lugares = {
+      "Huarihuilca": { coords: [-12.0825, -75.2105], accesibles: 5, anio: 2025, imagen: "imagenes/huarihuilca.png", reseña: "Una antigua ciudadela andina con arquitectura impresionante." },
+      "Cerrito La Libertad": { coords: [-12.0572, -75.2063], accesibles: 3, anio: 2025, imagen: "imagenes/cerrito.jpg", reseña: "Un mirador que ofrece vistas panorámicas espectaculares." },
+      "Iglesia Santo Cura de Ars": { coords: [-12.0612, -75.2045], accesibles: 6, anio: 2025, imagen: "imagenes/iglesia.jpg", reseña: "Un lugar de culto con historia y belleza arquitectónica." }
+    };
+
+    const map = L.map('mapa').setView([-12.06, -75.2], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '© OpenStreetMap',
+      maxZoom: 18
+    }).addTo(map);
+
+    for (const [nombre, data] of Object.entries(lugares)) {
+      const marker = L.marker(data.coords).addTo(map);
+      marker.on("click", () => {
+        document.getElementById("nombreLugar").value = nombre;
+        document.getElementById("visitas").value = Math.floor(Math.random() * (1750 - 1100 + 1)) + 1100;
+        document.getElementById("accesibles").value = data.accesibles;
+        document.getElementById("anio").value = data.anio;
+
+        L.popup()
+          .setLatLng(data.coords)
+          .setContent(`
+            <div class="popup-contenido">
+              <img src="${data.imagen}" alt="${nombre}" class="imagen-popup" style="width:100%;max-width:200px;"/>
+              <h3>${nombre}</h3>
+              <p>${data.reseña}</p>
+              <p><strong>Año:</strong> ${data.anio}</p>
+              <p><strong>Lugares accesibles:</strong> ${data.accesibles}</p>
+            </div>
+          `)
+          .openOn(map);
+      });
+    }
+
+    const btnEnviar = document.getElementById("btnEnviar");
+    const mensajeDiv = document.getElementById("mensaje");
+
+    document.getElementById("formResena").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const lugar = document.getElementById("nombreLugar").value.trim();
+      const accesibilidad = document.getElementById("accesibilidad").value;
+      const comentario = document.getElementById("comentario").value.trim();
+
+      if (!lugar || !accesibilidad || comentario.length < 5) {
+        mostrarMensaje("Completa todos los campos correctamente.", "error");
+        return;
+      }
+
+      btnEnviar.disabled = true;
+      mostrarMensaje("", "");
+
+      const data = {
+        lugar,
+        visitas: parseInt(document.getElementById("visitas").value),
+        accesibles: parseInt(document.getElementById("accesibles").value),
+        anio: parseInt(document.getElementById("anio").value),
+        accesibilidad,
+        comentario,
+        fecha: new Date()
+      };
+
+      try {
+        await addDoc(collection(db, "Reseñas"), data);
+        mostrarMensaje("Reseña enviada correctamente", "exito");
+        limpiarFormulario();
+      } catch (error) {
+        console.error("Error al guardar:", error);
+        mostrarMensaje("Hubo un error al enviar la reseña.", "error");
+      } finally {
+        btnEnviar.disabled = false;
+      }
+    });
+
+    function mostrarMensaje(texto, tipo) {
+      mensajeDiv.textContent = texto;
+      mensajeDiv.className = "mensaje";
+      if (tipo) mensajeDiv.classList.add(tipo);
+      mensajeDiv.style.display = texto ? "block" : "none";
+    }
+
+    function limpiarFormulario() {
+      document.getElementById("formResena").reset();
+      document.getElementById("nombreLugar").value = "";
+      document.getElementById("visitas").value = "";
+      document.getElementById("accesibles").value = "";
+      document.getElementById("anio").value = "";
+    }
+
+    // Función para renderizar estrellas según accesibilidad
+    function renderEstrellas(promedio) {
+      const estrellas = Math.round(promedio);
+      return "★".repeat(estrellas) + "☆".repeat(5 - estrellas);
+    }
+
+    // Función para convertir accesibilidad a número (para estrellas)
+    function accesibilidadANumero(nivel) {
+      switch (nivel) {
+        case "Baja": return 1;
+        case "Media": return 3; // Media puede ser 3 para que se note diferencia entre baja y alta
+        case "Alta": return 5;
+        default: return 0;
+      }
+    }
+
+    function inicializarEscuchas() {
+      const reseñasDiv = document.getElementById("reseñasAnteriores");
+      const rankingList = document.getElementById("rankingLugares");
+      const btnToggle = document.getElementById("btnToggleReseñas");
+      const q = query(collection(db, "Reseñas"), orderBy("fecha", "desc"));
+
+      let reseñasTotales = [];
+      let mostrandoTodas = false;
+
+      onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+          reseñasDiv.innerHTML = "<p>No hay reseñas aún.</p>";
+          rankingList.innerHTML = "<li>No hay datos para ranking.</li>";
+          btnToggle.style.display = "none";
+          return;
+        }
+
+        reseñasTotales = [];
+        const puntuacionMap = { Baja: 1, Media: 3, Alta: 5 };
+        const acumulados = {};
+        const conteos = {};
+
+        snapshot.forEach(doc => {
+          const r = doc.data();
+          reseñasTotales.push(r);
+
+          if (r.lugar && r.accesibilidad) {
+            acumulados[r.lugar] = (acumulados[r.lugar] || 0) + (puntuacionMap[r.accesibilidad] || 0);
+            conteos[r.lugar] = (conteos[r.lugar] || 0) + 1;
+          }
+        });
+
+        // Renderizar reseñas con estrellas en cada una
+        function renderReseñas() {
+          reseñasDiv.innerHTML = "";
+          const mostrar = mostrandoTodas ? reseñasTotales : reseñasTotales.slice(0, 5);
+          mostrar.forEach(r => {
+            const estrellas = renderEstrellas(accesibilidadANumero(r.accesibilidad) / 1); // ya está en escala 1-5
+            const div = document.createElement("div");
+            div.classList.add("reseña-item");
+            div.innerHTML = `
+              <strong>Lugar:</strong> ${r.lugar}<br/>
+              <strong>Accesibilidad:</strong> ${r.accesibilidad} <span class="estrellas">${estrellas}</span><br/>
+              <strong>Comentario:</strong> ${r.comentario}<br/>
+              <small>${new Date(r.fecha.seconds * 1000).toLocaleString()}</small>
+            `;
+            reseñasDiv.appendChild(div);
+          });
+        }
+
+        renderReseñas();
+
+        btnToggle.style.display = reseñasTotales.length > 5 ? "block" : "none";
+        btnToggle.textContent = mostrandoTodas ? "Mostrar menos" : "Mostrar más";
+        btnToggle.onclick = () => {
+          mostrandoTodas = !mostrandoTodas;
+          renderReseñas();
+          btnToggle.textContent = mostrandoTodas ? "Mostrar menos" : "Mostrar más";
+        };
+
+        const promedios = [];
+        for (const lugar in acumulados) {
+          promedios.push({
+            lugar,
+            promedio: acumulados[lugar] / conteos[lugar]
+          });
+        }
+        promedios.sort((a,b) => b.promedio - a.promedio);
+
+        rankingList.innerHTML = "";
+        promedios.forEach(item => {
+          const li = document.createElement("li");
+          li.innerHTML = `${item.lugar} <span class="estrellas">${renderEstrellas(item.promedio)}</span> (${item.promedio.toFixed(2)})`;
+          rankingList.appendChild(li);
+        });
+      });
+    }
+
+    window.onload = () => {
+      inicializarEscuchas();
+    };
+  </script>
+</body>
+</html>
