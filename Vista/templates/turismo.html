@@ -1,0 +1,202 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ translate('Descubre Huancayo: Tu Guía Interactiva') }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename='styles-lugares.css') }}">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<div class="main-container">
+    <header class="text-center my-4">
+        <h1>{{ translate('Explora Huancayo y sus Encantos') }}</h1>
+        <p class="lead">{{ translate('Navega por los puntos de interés y sumérgete en la realidad virtual.') }}</p>
+    </header>
+
+    <div id="map-section" class="map-immersive-container">
+        <div id="map"></div>
+    </div>
+
+    <div id="vr-section" class="vr-immersive-container">
+        <button id="closeIframe" onclick="cerrarIframe()" aria-label="{{ translate('Cerrar vista 360°') }}">✖</button>
+        <iframe id="mapIframe"
+                width="100%"
+                height="100%"
+                style="border:0;"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade">
+        </iframe>
+    </div>
+
+    <section id="places-list" class="container my-5">
+        <h2 class="text-center mb-4">{{ translate('Lugares Destacados de Huancayo') }}</h2>
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="lugares-grid">
+        </div>
+    </section>
+</div>
+
+<script>
+    // Inicialización del mapa de Leaflet
+    const map = L.map('map').setView([-12.0655, -75.2048], 13);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors',
+        maxZoom: 18,
+        minZoom: 8
+    }).addTo(map);
+
+    // Datos de los lugares (¡IMPORTANTISIMO: USA LINKS DE EMBED REALES AQUÍ!)
+    const lugares = [
+        {
+            nombre: "{{ translate('Cerrito de la Libertad') }}",
+            coords: [-12.0572, -75.2063],
+            imagen: "https://consultasenlinea.mincetur.gob.pe/fichaInventario//foto.aspx?cod=569569",
+            vr: "https://www.google.com/maps/embed?pb=!4v1748999733433!6m8!1m7!1sCAoSFkNJSE0wb2dLRUlDQWdJRDRxTmlkV1E.!2m2!1d-12.06281212471614!2d-75.19648758382348!3f140.08297452240208!4f-7.013527779798721!5f0.7820865974627469", // Reemplazar con URL real de 360
+            descripcion: "{{ translate('Mirador con vistas panorámicas de Huancayo, áreas verdes y juegos. Ideal para la familia.') }}"
+        },
+        {
+            nombre: "{{ translate('Parque de la Identidad Wanka') }}",
+            coords: [-12.0612, -75.2069],
+            imagen: "https://dynamic-media-cdn.tripadvisor.com/media/photo-o/0b/93/e6/0f/20160610-140918-largejpg.jpg?w=1200&h=-1&s=1",
+            vr: "https://www.google.com/maps/embed?pb=!4v1749002195911!6m8!1m7!1sCAoSFkNJSE0wb2dLRUlDQWdJQ3BwSUhWYWc.!2m2!1d-12.04938704303023!2d-75.19789992622297!3f3.417722179464814!4f-5.073788326880788!5f0.7820865974627469", // CAMBIA ESTO
+            descripcion: "{{ translate('Parque escultórico que celebra la cultura Wanka con arte y arquitectura tradicional.') }}"
+        },
+        {
+            nombre: "{{ translate('Convento de Ocopa (Santa Rosa de Ocopa)') }}",
+            coords: [-11.9222, -75.2700],
+            imagen: "https://portal.andina.pe/EDPfotografia3/Thumbnail/2025/04/11/001160517W.jpg",
+            vr: "https://www.google.com/maps/embed?pb=!4v1749002225854!6m8!1m7!1sCAoSFkNJSE0wb2dLRUlDQWdJQ2Zqb0tiV2c.!2m2!1d-11.87390689358575!2d-75.29431421041777!3f122.176674!4f0!5f0.7820865974627469", // CAMBIA ESTO
+            descripcion: "{{ translate('Histórico convento franciscano con valiosa biblioteca misional y museo.') }}"
+        },
+        {
+            nombre: "{{ translate('Laguna de Paca') }}",
+            coords: [-11.7583, -75.4850],
+            imagen: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuHPXmzh5Q-kIVJgJhdxDFfYUFeLIdBiINtQ&s",
+            vr: "https://www.google.com/maps/embed?pb=!4v1749002252414!6m8!1m7!1sCAoSF0NJSE0wb2dLRUlDQWdJQ0U1WWpHX2dF!2m2!1d-11.728055625446!2d-75.50805558716846!3f333.7227!4f0!5f0.7820865974627469", // CAMBIA ESTO
+            descripcion: "{{ translate('Serena laguna andina ideal para paseos en bote y observación de aves, rodeada de mitos.') }}"
+        },
+        {
+            nombre: "{{ translate('Nevado Huaytapallana (Acceso)') }}",
+            coords: [-11.9200, -74.9600],
+            imagen: "https://portal.andina.pe/EDPfotografia2/Thumbnail/2011/01/20/000146347W.jpg",
+            vr: "https://www.google.com/maps/embed?pb=!4v1749002308486!6m8!1m7!1sCAoSFkNJSE0wb2dLRUlDQWdJRHB2TEN3QkE.!2m2!1d-11.95375130863512!2d-75.04226157870207!3f292.51062!4f0!5f0.7820865974627469", // CAMBIA ESTO
+            descripcion: "{{ translate('Majestuoso nevado andino y fuente de ríos, ideal para andinismo y ecoturismo (requiere guía).') }}"
+        },
+        {
+            nombre: "{{ translate('Museo Salesiano Vicente Rasetto') }}",
+            coords: [-12.0673, -75.2132],
+            imagen: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/28/Museo_Salesiano_Vivente_Rasetto.jpg/960px-Museo_Salesiano_Vivente_Rasetto.jpg",
+            vr: "https://www.google.com/maps/embed?pb=!4v1749002374422!6m8!1m7!1sG5wTfCwcLjs4qM0hdcOpTw!2m2!1d-12.06553008059578!2d-75.21443391619079!3f142.54563560927275!4f-14.893255015364744!5f0.7820865974627469", // CAMBIA ESTO
+            descripcion: "{{ translate('Variada colección de arqueología, arte y historia natural.') }}"
+        },
+        {
+            nombre: "{{ translate('Plaza Constitución') }}",
+            coords: [-12.0680, -75.2050],
+            imagen: "https://scontent-lim1-1.xx.fbcdn.net/v/t1.6435-9/158796412_2459978877482346_6650320610651766138_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=127cfc&_nc_eui2=AeFaRNxogFMW7jlDllTsNNjTV_pdaBmjseFX-l1oGaOx4cEdrG5JQvqB_j1Q1GRlCvf1sJ-NJv1C1TqLBHl47yTj&_nc_ohc=HktSqptoac4Q7kNvwE4zldj&_nc_oc=AdmMGbqvaQDR7yn_WJXTee3Mm1-YXt-MjhzvRaf1qYZl1r1D3-YUyBlwyKP44GV3dGXxThSPP9_3Vri1OFjbo6WS&_nc_zt=23&_nc_ht=scontent-lim1-1.xx&_nc_gid=E6ym5qF-NoF2lhUdcvTPhA&oh=00_AfPtJv7CkjnfyOD9twY2d7yZyDJ2RBiqm1vPpDEknzOCIg&oe=68685B78",
+            vr: "https://www.google.com/maps/embed?pb=!4v1749002402414!6m8!1m7!1sCAoSF0NJSE0wb2dLRUlDQWdJQ09fOHIydFFF!2m2!1d-12.06812116633849!2d-75.21008092726005!3f320.95912358936295!4f-2.6811214453861822!5f0.7820865974627469", // CAMBIA ESTO
+            descripcion: "{{ translate('Corazón de Huancayo, rodeada por la Catedral. Punto de encuentro vibrante.') }}"
+        },
+        {
+            nombre: "{{ translate('Hualhuas (Centro Artesanal)') }}",
+            coords: [-12.0000, -75.2000],
+            imagen: "https://portal.andina.pe/EDPfotografia2/Thumbnail/2010/02/17/000118960W.jpg", // Usando Laguna de Paca como ejemplo, buscar una de Hualhuas
+            vr: "https://www.google.com/maps/embed?pb=!4v1749002458253!6m8!1m7!1sXYEYEL1MRizLgPZlKvUL_Q!2m2!1d-11.97169360783481!2d-75.25073064550723!3f271.867752241306!4f-12.359588677205423!5f0.7820865974627469", // CAMBIA ESTO
+            descripcion: "{{ translate('Pueblo famoso por sus textiles de alpaca y oveja. Observa el proceso artesanal.') }}"
+        },
+        {
+            nombre: "{{ translate('Mercado Artesanal de Huancayo') }}",
+            coords: [-12.0620, -75.2075],
+            imagen: "https://scontent-lim1-1.xx.fbcdn.net/v/t1.6435-9/127499475_1879489968856302_5378141066542393658_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeFTIeR_UAFMXQMfiZTw6YhPV1X3_nv6AYtXVff-e_oBiwttJ7RmzniruozoPBagirBACdN7yDaQh7NXPydqwdsB&_nc_ohc=0RSt45FuaaEQ7kNvwEZmoX3&_nc_oc=AdmL5hkuMr15hfOJPXEi7YhnmaKI-awZAiisg5R0kvpJTGGWRtR6Qn7EYRZ0DFFLFRxni0jj6iXGIGFhay1c6BbR&_nc_zt=23&_nc_ht=scontent-lim1-1.xx&_nc_gid=6GxDttK2L2njxLfhr0xcWA&oh=00_AfMz9fubC5-_xkE-ZXFGpNvhWefU7TlBEo6zs0v21WZNew&oe=68688CEE", // Ejemplo de Flickr
+            vr: "https://www.google.com/maps/embed?pb=!4v1749002676981!6m8!1m7!1sz5zKBkx6vy9p9r3NfzjgCA!2m2!1d-12.0711005841075!2d-75.20737460505092!3f230.91737!4f0!5f0.7820865974627469", // CAMBIA ESTO
+            descripcion: "{{ translate('Un vibrante mercado donde encontrarás artesanías locales, textiles, platería y productos típicos de la región.') }}"
+        },
+
+    ];
+
+    // Función para mostrar el iframe con la URL de la vista 360
+    function mostrarIframe(url) {
+        const mapSection = document.getElementById('map-section');
+        const vrSection = document.getElementById('vr-section');
+        const iframe = document.getElementById('mapIframe');
+        const placesList = document.getElementById('places-list');
+        const body = document.body;
+
+        mapSection.style.display = 'none';
+        placesList.style.display = 'none';
+
+        iframe.src = url;
+
+        vrSection.style.display = 'flex';
+        setTimeout(() => {
+            vrSection.classList.add('active');
+            body.classList.add('vr-active');
+        }, 50);
+
+        vrSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+    }
+
+    // Función para cerrar el iframe
+    function cerrarIframe() {
+        const mapSection = document.getElementById('map-section');
+        const vrSection = document.getElementById('vr-section');
+        const iframe = document.getElementById('mapIframe');
+        const placesList = document.getElementById('places-list');
+        const body = document.body;
+
+        vrSection.classList.remove('active');
+        body.classList.remove('vr-active');
+
+        setTimeout(() => {
+            vrSection.style.display = 'none';
+            iframe.src = '';
+            mapSection.style.display = 'block';
+            placesList.style.display = 'block';
+            mapSection.scrollIntoView({behavior: 'smooth', block: 'start'});
+        }, 500);
+    }
+
+    // Genera las tarjetas de lugares y agrega marcadores al mapa
+    const lugaresGrid = document.getElementById('lugares-grid');
+
+    lugares.forEach(lugar => {
+        // Validación de URL para vistas 360 para que no muestre el botón si no es válida
+        const isVrAvailable = lugar.vr && lugar.vr.startsWith('http') && lugar.vr.includes('google.com/maps'); // Ajustado para ser más específico
+
+        // Contenido del Popup
+        const popupContent = `
+            <div class="popup-content">
+                <h5>${lugar.nombre}</h5>
+                <img src="${lugar.imagen}" alt="${lugar.nombre}">
+                <p>${lugar.descripcion}</p>
+                <div class="popup-button-group">
+                    ${isVrAvailable ? `<button class="popup-button vr-btn" onclick="mostrarIframe('${lugar.vr}')">{{ translate('Ver en 360°') }}</button>` : `<p class="not-available">{{ translate('Vista 360° no disponible.') }}</p>`}
+                </div>
+            </div>
+        `;
+        L.marker(lugar.coords).addTo(map).bindPopup(popupContent, {
+            maxWidth: 300,
+            closeButton: true
+        });
+
+        // Crear tarjeta para la lista de lugares
+        const colDiv = document.createElement('div');
+        colDiv.className = 'col';
+        colDiv.innerHTML = `
+            <div class="card h-100 place-card" data-coords="${lugar.coords[0]},${lugar.coords[1]}">
+                <img src="${lugar.imagen}" class="card-img-top" alt="${lugar.nombre}">
+                <div class="card-body">
+                    <h5 class="card-title">${lugar.nombre}</h5>
+                    <p class="card-text">${lugar.descripcion}</p>
+                    ${isVrAvailable ? `<button class="btn btn-primary btn-sm mt-2" onclick="mostrarIframe('${lugar.vr}')">{{ translate('Ver en 360°') }}</button>` : `<p class="text-muted mt-2">{{ translate('Vista 360° no disponible.') }}</p>`}
+                </div>
+            </div>
+        `;
+        lugaresGrid.appendChild(colDiv);
+    });
+
+    // Se eliminó el Event listener para los botones "Ver en Mapa"
+    // y cualquier lógica relacionada con mostrar/ocultar secciones al hacer clic en "Ver en Mapa"
+</script>
+
+{% endblock %}

@@ -1,0 +1,434 @@
+/* Reset de márgenes y paddings */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Variables CSS para la paleta de colores y tamaños */
+:root {
+    --color-primary: #4a90e2; /* Azul vibrante, ¡nuestro protagonista! */
+    --color-secondary: #0bbcdb; /* Cian brillante, para acentos */
+    --color-accent: #ffdb58; /* Amarillo dorado, un destello de alegría */
+    --color-dark-bg: #1A1A1A; /* Un fondo profundo y elegante */
+    --color-medium-bg: #222222; /* El lienzo para nuestras tarjetas */
+    --color-light-text: #D0D0D0; /* El texto que susurra historias */
+    --color-lighter-text: #E8E8E8; /* Para los detalles que brillan */
+    --color-border: rgba(255, 255, 255, 0.08); /* Un contorno apenas visible */
+    --color-shadow-dark: rgba(0, 0, 0, 0.35); /* La sombra de una idea */
+    --color-shadow-light: rgba(0, 0, 0, 0.15); /* Un toque de misterio */
+    --border-radius-lg: 15px;
+    --border-radius-md: 8px;
+
+    --font-primary: 'Fira Sans', sans-serif; /* Elegancia y claridad */
+    --font-secondary: 'Lora', serif; /* La voz de nuestras aventuras */
+}
+
+/* Estilo global */
+body {
+    background-color: var(--color-dark-bg);
+    font-family: var(--font-primary);
+    color: var(--color-light-text);
+    line-height: 1.4;
+    overflow-x: hidden;
+    font-size: 15px;
+}
+
+/* Scrollbar personalizado (Webkit) */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--color-dark-bg);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--color-primary);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #3a7fd0;
+}
+
+/* Estilo del header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 3.5%;
+    background-color: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 1px 5px var(--color-shadow-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(6px);
+    border-bottom: 0.5px solid var(--color-border);
+}
+
+header .logo {
+    font-family: var(--font-secondary);
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--color-primary);
+    letter-spacing: 0.2px;
+    text-shadow: 1px 1px 3px var(--color-shadow-dark);
+}
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 20px;
+}
+
+nav ul li a {
+    color: var(--color-light-text);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    transition: all 0.15s ease-in-out;
+    position: relative;
+    padding-bottom: 4px;
+}
+
+nav ul li a::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1.5px;
+    background-color: var(--color-secondary);
+    bottom: 0;
+    left: 0;
+    transition: width 0.15s ease-in-out;
+}
+
+nav ul li a:hover {
+    color: var(--color-secondary);
+}
+
+nav ul li a:hover::after {
+    width: 100%;
+}
+
+/* Estilo de la introducción */
+.intro-section {
+    text-align: center;
+    padding: 50px 4%;
+    background: linear-gradient(rgba(0, 0, 0, 0.5), var(--color-dark-bg) 80%), url('https://source.unsplash.com/random/1400x500/?peru,machupicchu,ancientruins') no-repeat center center/cover;
+    color: white;
+    margin-bottom: 40px;
+    box-shadow: inset 0 -5px 10px var(--color-shadow-light);
+    border-bottom: 0.5px solid var(--color-border);
+}
+
+.intro-section .title {
+    font-family: var(--font-secondary);
+    font-size: 40px;
+    color: var(--color-primary);
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 5px var(--color-shadow-dark);
+    line-height: 1.2;
+    letter-spacing: 0.5px;
+}
+
+.intro-section .intro-text {
+    font-size: 16px;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 10px;
+    opacity: 0.85;
+    line-height: 1.5;
+    color: var(--color-lighter-text);
+}
+
+/* Estilo de los destinos */
+.destinos-section {
+    display: flex; /* Mantenemos flex para un diseño de columna de tarjetas */
+    flex-direction: column; /* Las tarjetas se apilan verticalmente */
+    gap: 25px;
+    padding: 0 3.5%;
+    margin-bottom: 50px;
+}
+
+.destino-card {
+    display: flex; /* ¡Aquí es donde la magia horizontal sucede! */
+    align-items: stretch; /* Asegura que la imagen y el contenido tengan la misma altura */
+    background-color: var(--color-medium-bg);
+    border-radius: var(--border-radius-md);
+    overflow: hidden;
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    box-shadow: 0 3px 10px var(--color-shadow-light);
+    border: 0.5px solid var(--color-border);
+    /* Altura consistente para todas las tarjetas horizontales */
+    min-height: 200px; /* Suficiente para una imagen y contenido pequeño */
+    max-height: 250px; /* Límite para evitar tarjetas gigantes */
+}
+
+.destino-card.left {
+    flex-direction: row; /* Imagen a la izquierda, contenido a la derecha */
+}
+
+.destino-card.right {
+    flex-direction: row-reverse; /* Contenido a la izquierda, imagen a la derecha */
+}
+
+.destino-card:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0px 8px 20px var(--color-shadow-dark);
+    border-color: var(--color-primary);
+}
+
+.image-container {
+    width: 40%; /* La imagen ocupa el 40% del ancho de la tarjeta */
+    flex-shrink: 0; /* Evita que la imagen se encoja */
+    height: 100%; /* La imagen ocupa la altura completa de la tarjeta */
+    overflow: hidden;
+    position: relative;
+    border-right: 0.5px solid var(--color-border); /* Borde sutil a la derecha de la imagen */
+}
+
+.destino-card.right .image-container {
+    border-left: 0.5px solid var(--color-border); /* Borde a la izquierda para el lado derecho */
+    border-right: none;
+}
+
+.destino-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Asegura que la imagen cubra sin distorsión */
+    transition: transform 0.3s ease-in-out;
+}
+
+.destino-card:hover img {
+    transform: scale(1.03);
+}
+
+.card-content {
+    padding: 20px;
+    width: 60%; /* El contenido ocupa el 60% restante */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribuye el espacio para título, texto y botón */
+    flex-grow: 1; /* Permite que el contenido crezca para llenar el espacio */
+    flex-shrink: 1; /* Permite que el contenido se encoja si es necesario */
+}
+
+.card-content h3 {
+    font-family: var(--font-secondary);
+    font-size: 20px;
+    color: var(--color-primary); /* ¡Título de tarjeta con el azul protagonista! */
+    margin-bottom: 8px;
+    text-shadow: none;
+    letter-spacing: 0.2px;
+}
+
+.card-content p {
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-light-text);
+    margin-bottom: 12px;
+    /* Usamos 'flex-grow: 1' para que el párrafo ocupe el espacio disponible
+       y 'text-overflow: ellipsis' con 'overflow: hidden' para recortar si es demasiado largo */
+    flex-grow: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Limita el texto a 3 líneas */
+    -webkit-box-orient: vertical;
+}
+
+/* Botón de acción en la tarjeta */
+.card-content button {
+    background-color: var(--color-secondary);
+    color: var(--color-dark-bg);
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.15s ease-in-out, transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    align-self: flex-start;
+    letter-spacing: 0.2px;
+    box-shadow: 0 2px 5px var(--color-shadow-light);
+}
+
+.card-content button:hover {
+    background-color: #08a9c2;
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px var(--color-shadow-dark);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding: 20px;
+    background-color: var(--color-medium-bg);
+    margin-top: 40px;
+    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
+    border-top: 0.5px solid var(--color-border);
+    box-shadow: 0 -2px 8px var(--color-shadow-light);
+}
+
+footer p {
+    font-size: 14px;
+    color: var(--color-light-text);
+    opacity: 0.7;
+}
+
+/* Media Queries para Responsividad (ajustadas para el diseño horizontal) */
+@media (max-width: 1024px) {
+    body {
+        font-size: 14px;
+    }
+
+    header {
+        padding: 10px 3%;
+    }
+
+    nav ul {
+        gap: 15px;
+    }
+
+    nav ul li a {
+        font-size: 13px;
+    }
+
+    .intro-section .title {
+        font-size: 36px;
+    }
+
+    .intro-section .intro-text {
+        font-size: 15px;
+    }
+
+    .destino-card {
+        min-height: 180px; /* Altura un poco más pequeña en tablets */
+        max-height: 230px;
+    }
+
+    .image-container {
+        width: 35%; /* Imagen ligeramente más pequeña en tablets */
+    }
+
+    .card-content {
+        width: 65%;
+        padding: 18px;
+    }
+
+    .card-content h3 {
+        font-size: 18px;
+    }
+
+    .card-content p {
+        font-size: 13px;
+    }
+
+    .card-content button {
+        padding: 7px 14px;
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        padding: 10px 3%;
+    }
+
+    header .logo {
+        margin-bottom: 10px;
+        font-size: 20px;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    nav ul li a {
+        font-size: 12px;
+    }
+
+    .intro-section {
+        padding: 35px 3%;
+    }
+
+    .intro-section .title {
+        font-size: 30px;
+    }
+
+    .intro-section .intro-text {
+        font-size: 14px;
+    }
+
+    /* ¡Las tarjetas se vuelven verticales en pantallas pequeñas para una mejor legibilidad! */
+    .destino-card {
+        flex-direction: column !important; /* Forzamos la dirección de columna */
+        min-height: unset; /* Quitamos alturas mínimas para adaptación */
+        max-height: unset;
+        align-items: center; /* Centramos el contenido apilado */
+    }
+
+    .image-container {
+        width: 100%; /* La imagen ocupa todo el ancho */
+        height: 180px; /* Altura fija para la imagen */
+        border-right: none; /* Quitamos bordes laterales */
+        border-bottom: 0.5px solid var(--color-border); /* Borde inferior para separar */
+    }
+    .destino-card.right .image-container { /* Aseguramos que solo tenga el borde inferior */
+        border-left: none;
+        border-bottom: 0.5px solid var(--color-border);
+    }
+
+    .card-content {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .card-content h3 {
+        font-size: 16px;
+    }
+
+    .card-content p {
+        font-size: 12px;
+        -webkit-line-clamp: unset; /* Permitimos que el texto se expanda más en móvil */
+    }
+
+    .card-content button {
+        width: 100%;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    header .logo {
+        font-size: 18px;
+    }
+
+    nav ul {
+        gap: 6px;
+    }
+
+    nav ul li a {
+        font-size: 11px;
+    }
+
+    .intro-section .title {
+        font-size: 24px;
+    }
+
+    .intro-section .intro-text {
+        font-size: 13px;
+    }
+
+    .card-content h3 {
+        font-size: 14px;
+    }
+
+    .card-content p {
+        font-size: 11px;
+    }
+}

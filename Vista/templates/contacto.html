@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block title %}{{ translate('Contacto - Turismo Accesible') }}{% endblock %}
+
+{% block content %}
+{# Asegúrate de que Font Awesome se cargue en base.html o aquí si solo se usa en esta página #}
+{# Ejemplo si lo cargas solo aquí: #}
+{# <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" /> #}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='styles-contacto.css') }}" />
+
+<section class="contact-header">
+    <h1>{{ translate('Contáctanos') }} <i class="fas fa-envelope header-icon"></i></h1>
+    <p>{{ translate('Estamos comprometidos con un turismo inclusivo en Huancayo. Si tienes preguntas, sugerencias o necesitas más información sobre accesibilidad y nuestros servicios, no dudes en escribirnos.') }}</p>
+</section>
+
+<section class="contact-container">
+    <div class="contact-form-section">
+        <h2>{{ translate('Envíanos un Mensaje Directo (WhatsApp)') }} <i class="fas fa-paper-plane form-icon"></i></h2>
+        <form class="contact-form" id="whatsappForm">
+            <label for="name"><i class="fas fa-user icon-input"></i> {{ translate('Nombre completo') }}</label>
+            <input type="text" id="name" name="name" placeholder="{{ translate('Tu nombre') }}" required>
+
+            <label for="email"><i class="fas fa-at icon-input"></i> {{ translate('Correo electrónico') }}</label>
+            <input type="email" id="email" name="email" placeholder="{{ translate('ejemplo@correo.com') }}" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$">
+
+            <label for="subject"><i class="fas fa-tag icon-input"></i> {{ translate('Asunto') }}</label>
+            <input type="text" id="subject" name="subject" placeholder="{{ translate('Ej: Consulta sobre accesibilidad') }}" required>
+
+            <label for="message"><i class="fas fa-comment-dots icon-input"></i> {{ translate('Mensaje') }}</label>
+            <textarea id="message" name="message" rows="5" placeholder="{{ translate('Escribe tu mensaje aquí...') }}" required></textarea>
+
+            <button type="submit">{{ translate('Enviar Mensaje por WhatsApp') }} <i class="fab fa-whatsapp button-whatsapp-icon"></i></button>
+        </form>
+    </div>
+
+    <div class="contact-info-section">
+        <h2>{{ translate('Nuestra Información de Contacto') }} <i class="fas fa-info-circle info-icon"></i></h2>
+        <p>{{ translate('Siempre estamos disponibles para ayudarte a planificar tu viaje accesible.') }}</p>
+        <div class="info-details">
+            <p><i class="fas fa-envelope icon-text"></i> <strong>{{ translate('Correo Electrónico:') }}</strong> <a href="mailto:75059727@continental.edu.pe">75059727@continental.edu.pe </a></p>
+            <p><i class="fas fa-phone icon-text"></i> <strong>{{ translate('Teléfono:') }}</strong> <a href="tel:+51910927801">+51 910 927 801</a></p>
+            <p><i class="fas fa-clock icon-text"></i> <strong>{{ translate('Horario de Atención:') }}</strong> {{ translate('Lunes a Viernes, 9:00 AM - 6:00 PM (Hora de Perú)') }}</p>
+        </div>
+
+        <div class="social-media-links">
+            <h3>{{ translate('Síguenos en Redes Sociales') }} <i class="fas fa-share-alt social-icon-title"></i></h3>
+            <ul>
+                <li><a href="https://www.facebook.com/marlon.bonifacio.rojas.2025" target="_blank" rel="noopener noreferrer"><i class="fab fa-facebook-f social-icon facebook-icon"></i> Facebook</a></li>
+                <li><a href="https://www.instagram.com/rojasmarlonbonifacio/" target="_blank" rel="noopener noreferrer"><i class="fab fa-instagram social-icon instagram-icon"></i> Instagram</a></li>
+                <li><a href="https://www.tiktok.com/@marlonbonifaciorojas" target="_blank" rel="noopener noreferrer"><i class="fab fa-tiktok social-icon tiktok-icon"></i> TikTok</a></li>
+                {# Se ha actualizado el número de WhatsApp aquí #}
+                {# Se ha cambiado wa.me por api.whatsapp.com para priorizar la apertura en el navegador #}
+                <li><a href="https://api.whatsapp.com/send/?phone=51910927801&text&type=phone_number&app_absent=0" target="_blank" rel="noopener noreferrer"><i class="fab fa-whatsapp social-icon whatsapp-icon"></i> WhatsApp</a></li>
+            </ul>
+        </div>
+    </div>
+</section>
+
+<section class="faq-section">
+    <h2>{{ translate('Preguntas Frecuentes') }} <i class="fas fa-question-circle faq-icon-title"></i></h2>
+    <div class="faq-items">
+        <details>
+            <summary><i class="fas fa-question-circle faq-icon"></i> {{ translate('¿Los destinos en Huancayo están adaptados para sillas de ruedas?') }}</summary>
+            <p>{{ translate('Sí, muchos de los principales lugares turísticos y culturales en Huancayo están siendo adaptados. Nos enfocamos en destacar aquellos que cuentan con rampas, caminos accesibles y servicios adaptados. Te recomendamos consultar las descripciones de cada destino en nuestra sección de') }} <a href="/destinos-accesibles">{{ translate('Destinos Accesibles') }}</a>.</p>
+        </details>
+        <details>
+            <summary><i class="fas fa-question-circle faq-icon"></i> {{ translate('¿Se necesita reservar con anticipación los tours accesibles?') }}</summary>
+            <p>{{ translate('En la mayoría de los casos, sí. Especialmente para asegurar la disponibilidad de transporte adaptado y guías especializados, recomendamos reservar con al menos 48 horas de anticipación. Puedes ver nuestras opciones de tours en la sección de') }} <a href="/nuestros-tours">{{ translate('Nuestros Tours') }}</a>.</p>
+        </details>
+        <details>
+            <summary><i class="fas fa-question-circle faq-icon"></i> {{ translate('¿Hay guías disponibles para personas con discapacidad visual o auditiva?') }}</summary>
+            <p>{{ translate('Sí, colaboramos con guías capacitados en inclusión que pueden ofrecer servicios adaptados para personas con discapacidad visual (descripciones verbales detalladas) o auditiva (uso de lenguaje de señas). Por favor, solicita este servicio con anticipación a través de nuestro formulario de contacto o llamándonos directamente.') }}</p>
+        </details>
+        <details>
+            <summary><i class="fas fa-question-circle faq-icon"></i> {{ translate('¿Ofrecen servicios de transporte adaptado?') }}</summary>
+            <p>{{ translate('Sí, podemos ayudarte a coordinar servicios de transporte adaptado que incluyen vehículos con rampas o elevadores para sillas de ruedas. Para más detalles y costos, por favor,') }} <a href="#contact-form">{{ translate('contáctanos directamente') }}</a>.</p>
+        </details>
+        <details>
+            <summary><i class="fas fa-question-circle faq-icon"></i> {{ translate('¿Cómo puedo dar mi opinión o sugerencia sobre un destino?') }}</summary>
+            <p>{{ translate('¡Nos encantaría escuchar tu experiencia! Puedes enviarnos tus comentarios y sugerencias a través de nuestro formulario de contacto o escribirnos un correo electrónico. Tu opinión nos ayuda a mejorar y a promover un turismo verdaderamente inclusivo.') }}</p>
+        </details>
+    </div>
+</section>
+
+<footer>
+    <p>{{ translate('&copy; 2025 Turismo Accesible en Huancayo. Todos los derechos reservados.') }} <a href="/politica-de-privacidad">{{ translate('Política de Privacidad') }}</a> | <a href="/terminos-y-condiciones">{{ translate('Términos y Condiciones') }}</a></p>
+</footer>
+
+<script>
+    document.getElementById('whatsappForm').addEventListener('submit', function(event) {
+        // Previene el envío normal del formulario (que recargaría la página)
+        event.preventDefault();
+
+        // Obtén los valores de los campos del formulario
+        const name = document.getElementById('name').value;
+        const email = document.getElementById('email').value;
+        const subject = document.getElementById('subject').value;
+        const message = document.getElementById('message').value;
+
+        // Número de teléfono al que se enviará el mensaje (con código de país)
+        const phoneNumber = '51910927801';
+
+        // Crea el mensaje pre-llenado para WhatsApp
+        const whatsappMessage = `
+{{ translate('¡Hola! Tengo una consulta desde tu sitio web:') }}
+
+{{ translate('Nombre:') }} ${name}
+{{ translate('Correo:') }} ${email}
+{{ translate('Asunto:') }} ${subject}
+
+{{ translate('Mensaje:') }}
+${message}
+        `.trim();
+
+        // Codifica el mensaje para que sea una URL válida
+        const encodedMessage = encodeURIComponent(whatsappMessage);
+
+        // Construye la URL de WhatsApp.
+        // Usamos 'api.whatsapp.com/send' que a menudo prioriza la apertura en el navegador.
+        // También incluimos 'type=phone_number&app_absent=0' para un control más explícito.
+        const whatsappURL = `https://api.whatsapp.com/send/?phone=${phoneNumber}&text=${encodedMessage}&type=phone_number&app_absent=0`;
+
+        // Confirma con el usuario antes de abrir WhatsApp
+        const confirmation = confirm('{{ translate("Tu mensaje se preparará para ser enviado por WhatsApp Web en una nueva ventana/pestaña. ¿Deseas continuar?") }}');
+
+        if (confirmation) {
+            try {
+                const newWindow = window.open(whatsappURL, '_blank');
+                if (!newWindow || newWindow.closed || typeof newWindow.focus !== 'function') {
+                    alert('{{ translate("Parece que tu navegador bloqueó la ventana de WhatsApp. Por favor, desactiva el bloqueador de pop-ups o intenta abrir la conversación directamente: ") }}' + whatsappURL);
+                } else {
+                    this.reset(); // Limpia el formulario solo si la ventana se abrió con éxito
+                }
+            } catch (e) {
+                alert('{{ translate("Ocurrió un error al intentar abrir WhatsApp. Asegúrate de que tu navegador permita ventanas emergentes.") }}');
+                console.error('{{ translate("Error al abrir WhatsApp:") }}', e);
+            }
+        } else {
+            alert('{{ translate("Envío cancelado.") }}');
+        }
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+
+{% block title %}{{ translate('Mi Perfil') }}{% endblock %}
+
+{% block content %}
+{# Carga la fuente Montserrat, consistente con el CSS #}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='styles-configuracion.css') }}">
+
+<div class="profile-page-container">
+    <div class="config-card">
+        <h1 class="config-card__title">{{ translate('Mi Perfil') }}</h1> {# Cambiado a h1 para semántica, y clase BEM #}
+
+        <div class="profile-image-container" id="imageContainer">
+            <img id="profileImage" src="/static/imagenes/default-user.jpg" alt="{{ translate('Foto de perfil del usuario') }}" class="profile-image">
+            <div class="loading-overlay" id="loadingOverlay">
+                <div class="spinner"></div>
+                <p class="loading-overlay__text" id="loadingText">{{ translate('Guardando...') }}</p> {# Clase BEM #}
+            </div>
+        </div>
+
+        <form id="profileForm">
+            <div class="form-group">
+                <label for="displayNameInput" class="form-group__label">{{ translate('Nombre de Usuario:') }}</label> {# Clase BEM #}
+                <input type="text" id="displayNameInput" class="form-group__input" placeholder="{{ translate('Ingresa tu nombre de pantalla') }}" aria-label="{{ translate('Nombre de usuario') }}"> {# Clase BEM #}
+            </div>
+
+            <div class="form-group">
+                <label for="emailInput" class="form-group__label">{{ translate('Correo Electrónico:') }}</label> {# Clase BEM #}
+                <input type="email" id="emailInput" class="form-group__input" disabled aria-label="{{ translate('Correo electrónico del usuario (deshabilitado)') }}"> {# Clase BEM #}
+                <small class="form-text">{{ translate('Este correo es de solo lectura y proviene de tu cuenta.') }}</small>
+            </div>
+
+            <div class="buttons-container">
+                <button class="btn-custom btn-primary-custom" id="saveChangesBtn" type="submit">{{ translate('Guardar Cambios') }}</button>
+                <button class="btn-custom btn-secondary-custom" id="volverBtn" type="button">{{ translate('Volver') }}</button>
+            </div>
+        </form>
+
+        {# La alerta ahora tiene aria-live para accesibilidad #}
+        <div id="alertMessage" class="alert" role="alert" aria-live="polite" style="display: none;"></div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+    import { getStorage, ref, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-storage.js";
+
+    const principalUrl = "{{ url_for('principal') }}";
+
+    // Configuración de Firebase (asegúrate de que esta sea tu configuración real y se mantenga segura)
+    const firebaseConfig = {
+        apiKey: "AIzaSyARMkC0EBYElA8wVOpefSgMD4oADAIqD4o",
+        authDomain: "turismo-4e958.firebaseapp.com",
+        projectId: "turismo-4e958",
+        storageBucket: "turismo-4e958.appspot.com",
+        messagingSenderId: "442508451378",
+        appId: "1:442508451378:web:65bed298dffe5b22e6262b",
+        measurementId: "G-XSDKJ73NKW"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+
+    // Obtención de elementos del DOM
+    const profileImage = document.getElementById('profileImage');
+    const imageContainer = document.getElementById('imageContainer'); // Este elemento no tiene un evento de click para cambio de imagen
+    const displayNameInput = document.getElementById('displayNameInput');
+    const emailInput = document.getElementById('emailInput');
+    const saveChangesBtn = document.getElementById('saveChangesBtn');
+    const volverBtn = document.getElementById('volverBtn');
+    const alertMessage = document.getElementById('alertMessage');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+    const loadingText = document.getElementById('loadingText');
+    const profileForm = document.getElementById('profileForm');
+
+    let currentUser = null;
+    let initialDisplayName = "";
+
+    /**
+     * Muestra una alerta al usuario.
+     * @param {string} message El mensaje a mostrar.
+     * @param {'success' | 'danger' | 'info'} type El tipo de alerta (para estilos CSS).
+     */
+    function showAlert(message, type) {
+        alertMessage.textContent = message;
+        // Asigna la clase basada en el tipo para estilos específicos (ej. .alert-success, .alert-danger)
+        alertMessage.className = `alert alert--${type}`; // Usando BEM para modificadores de alerta
+        alertMessage.style.display = 'block'; // Asegura que sea visible
+        alertMessage.classList.add('show');
+
+        // Ocultar alerta después de 4 segundos
+        setTimeout(() => {
+            alertMessage.classList.remove('show');
+            // Espera a que termine la transición de ocultado antes de cambiar display a 'none'
+            setTimeout(() => {
+                alertMessage.style.display = 'none';
+            }, 300); // Coincide con la duración de la transición en CSS
+        }, 4000);
+    }
+
+    /**
+     * Controla la visibilidad del overlay de carga y el estado de los campos/botones.
+     * @param {boolean} show Si el overlay debe mostrarse.
+     * @param {string} message El mensaje a mostrar en el overlay.
+     */
+    function showLoading(show, message = "{{ translate('Guardando...') }}") {
+        if (show) {
+            loadingOverlay.classList.add('show');
+            loadingOverlay.style.display = 'flex'; // Asegura que el display sea flex para centrado
+        } else {
+            loadingOverlay.classList.remove('show');
+            // Retrasar el display: 'none' para permitir la transición de desvanecimiento
+            setTimeout(() => {
+                loadingOverlay.style.display = 'none';
+            }, 400); // Coincide con la duración de la transición en CSS
+        }
+        loadingText.textContent = message;
+        // Deshabilitar/habilitar elementos para evitar interacciones durante la carga
+        saveChangesBtn.disabled = show;
+        volverBtn.disabled = show;
+        displayNameInput.disabled = show;
+        // Si hay un input de imagen, también deshabilitarlo:
+        // if (imageUploadInput) imageUploadInput.disabled = show;
+    }
+
+    // Listener para el estado de autenticación de Firebase
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            emailInput.value = user.email;
+
+            // Intenta obtener el nombre de usuario de localStorage primero
+            const storedName = localStorage.getItem(`customDisplayName_${user.uid}`);
+            // Usa el nombre almacenado, o el displayName de Firebase, o la parte del email antes del '@'
+            initialDisplayName = storedName || user.displayName || user.email.split('@')[0];
+            displayNameInput.value = initialDisplayName;
+
+            // Lógica para cargar la foto de perfil
+            const storedPhotoPath = localStorage.getItem(`customPhotoPath_${user.uid}`);
+            if (storedPhotoPath) {
+                try {
+                    const imageRef = ref(storage, storedPhotoPath);
+                    const url = await getDownloadURL(imageRef);
+                    profileImage.src = url;
+                } catch (error) {
+                    console.warn('⚠️ {{ translate("Error al cargar la imagen personalizada de Firebase Storage, usando la URL de Firebase Auth o por defecto:") }}', error);
+                    // Si falla la carga de Firebase Storage, usa photoURL de Firebase Auth o la imagen por defecto
+                    profileImage.src = user.photoURL || '/static/imagenes/default-user.jpg';
+                }
+            } else {
+                // Si no hay path almacenado, usa photoURL de Firebase Auth o la imagen por defecto
+                profileImage.src = user.photoURL || '/static/imagenes/default-user.jpg';
+            }
+
+            // Aquí podrías habilitar un cursor de "pointer" si la imagen fuera clickeable para subir
+            // imageContainer.style.cursor = 'pointer'; // Si permites cambiar la imagen
+            imageContainer.style.cursor = 'default'; // Si no hay funcionalidad de cambio de imagen
+        } else {
+            // Si no hay usuario autenticado, redirige a la página de login
+            window.location.href = "{{ url_for('login') }}";
+        }
+    });
+
+    // Listener para el envío del formulario de perfil
+    profileForm.addEventListener('submit', async (event) => {
+        event.preventDefault(); // Previene el envío del formulario por defecto
+
+        if (!currentUser) {
+            showAlert('{{ translate("🚫 No hay usuario autenticado. Por favor, inicia sesión.") }}', 'danger');
+            return;
+        }
+
+        const currentDisplayName = displayNameInput.value.trim();
+        const isDisplayNameChanged = currentDisplayName !== initialDisplayName;
+
+        // Si no hay cambios en el nombre de usuario
+        if (!isDisplayNameChanged) {
+            showAlert('{{ translate("ℹ️ No hay cambios en el nombre para guardar.") }}', 'info');
+            return;
+        }
+
+        showLoading(true, "{{ translate('Actualizando nombre...') }}"); // Muestra el overlay de carga
+
+        try {
+            // Actualiza el perfil en Firebase Auth
+            await updateProfile(currentUser, { displayName: currentDisplayName });
+            // Almacena el nombre actualizado en localStorage para consistencia
+            localStorage.setItem(`customDisplayName_${currentUser.uid}`, currentDisplayName);
+
+            showAlert('{{ translate("✅ Nombre de usuario actualizado exitosamente.") }}', 'success');
+            initialDisplayName = currentDisplayName; // Actualiza el nombre inicial para futuras comparaciones
+        } catch (error) {
+            console.error('❌ {{ translate("Error al actualizar el nombre de usuario:") }}', error);
+            let errorMsg = '{{ translate("Ocurrió un error inesperado al guardar los cambios.") }}';
+            // Mensaje de error más específico de Firebase si está disponible
+            if (error.code) {
+                errorMsg = `{{ translate("Error:") }} ${error.code.replace('auth/', '')}. ${error.message}`;
+            }
+            showAlert(errorMsg, 'danger');
+        } finally {
+            showLoading(false); // Oculta el overlay de carga, independientemente del resultado
+        }
+    });
+
+    // Listener para el botón "Volver"
+    volverBtn.addEventListener('click', () => {
+        window.location.href = principalUrl; // Redirige a la página principal
+    });
+</script>
+
+{% endblock %}

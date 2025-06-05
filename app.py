@@ -200,4 +200,4 @@ def reentrenar_periodicamente():
 threading.Thread(target=reentrenar_periodicamente, daemon=True).start()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, port=1313)
