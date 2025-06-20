@@ -1,434 +1,216 @@
-/* Reset de márgenes y paddings */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-/* Variables CSS para la paleta de colores y tamaños */
+/* ========= Paleta de Colores Definida ========= */
 :root {
-    --color-primary: #4a90e2; /* Azul vibrante, ¡nuestro protagonista! */
-    --color-secondary: #0bbcdb; /* Cian brillante, para acentos */
-    --color-accent: #ffdb58; /* Amarillo dorado, un destello de alegría */
-    --color-dark-bg: #1A1A1A; /* Un fondo profundo y elegante */
-    --color-medium-bg: #222222; /* El lienzo para nuestras tarjetas */
-    --color-light-text: #D0D0D0; /* El texto que susurra historias */
-    --color-lighter-text: #E8E8E8; /* Para los detalles que brillan */
-    --color-border: rgba(255, 255, 255, 0.08); /* Un contorno apenas visible */
-    --color-shadow-dark: rgba(0, 0, 0, 0.35); /* La sombra de una idea */
-    --color-shadow-light: rgba(0, 0, 0, 0.15); /* Un toque de misterio */
-    --border-radius-lg: 15px;
-    --border-radius-md: 8px;
-
-    --font-primary: 'Fira Sans', sans-serif; /* Elegancia y claridad */
-    --font-secondary: 'Lora', serif; /* La voz de nuestras aventuras */
+    --sapphire-blue-transparent: rgba(15, 82, 186, 0.8);
+    --sapphire-darker-transparent: rgba(13, 71, 161, 0.85);
+    --sapphire-text-color: #0F52BA; /* Zafiro Sólido para mejor legibilidad */
+    --white-text: #FFFFFF;
+    --light-text: #E0E0E0;
+    --container-bg: #ffffff;
+    --text-color: #212529;
+    --dark-border-color: rgba(15, 82, 186, 0.3);
+    --shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    --hover-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    --border-radius: 12px;
 }
 
-/* Estilo global */
-body {
-    background-color: var(--color-dark-bg);
-    font-family: var(--font-primary);
-    color: var(--color-light-text);
-    line-height: 1.4;
-    overflow-x: hidden;
-    font-size: 15px;
+/* ========= Estilos Generales y del Contenedor Principal ========= */
+.acerca-main {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa; /* Fondo general muy claro */
+    color: var(--text-color);
+    line-height: 1.7;
 }
 
-/* Scrollbar personalizado (Webkit) */
-::-webkit-scrollbar {
-    width: 6px;
+/* ========= Cabecera de Introducción ========= */
+.intro-header {
+    background: var(--sapphire-blue-transparent);
+    color: var(--white-text);
+    padding: 5rem 2rem;
+    text-align: center;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    margin-bottom: 4rem;
+    box-shadow: var(--shadow);
 }
 
-::-webkit-scrollbar-track {
-    background: var(--color-dark-bg);
+.intro-content {
+    max-width: 800px;
+    margin: 0 auto;
 }
 
-::-webkit-scrollbar-thumb {
-    background: var(--color-primary);
-    border-radius: 3px;
+.intro-header .title {
+    font-size: 2.8rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--white-text);
 }
 
-::-webkit-scrollbar-thumb:hover {
-    background: #3a7fd0;
+.intro-header .intro-text {
+    font-size: 1.1rem;
+    color: var(--light-text);
+    max-width: 700px;
+    margin: 0 auto;
 }
 
-/* Estilo del header */
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 3.5%;
-    background-color: rgba(0, 0, 0, 0.7);
-    box-shadow: 0 1px 5px var(--color-shadow-light);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
-    backdrop-filter: blur(6px);
-    border-bottom: 0.5px solid var(--color-border);
+/* ========= Animaciones de Entrada para la Introducción ========= */
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-header .logo {
-    font-family: var(--font-secondary);
-    font-size: 22px;
-    font-weight: 600;
-    color: var(--color-primary);
-    letter-spacing: 0.2px;
-    text-shadow: 1px 1px 3px var(--color-shadow-dark);
+.animate-on-load {
+    animation: fadeInSlideUp 0.8s ease-out forwards;
 }
 
-nav ul {
-    list-style: none;
-    display: flex;
-    gap: 20px;
+.animate-on-load.delay-1 {
+    animation-delay: 0.2s;
 }
 
-nav ul li a {
-    color: var(--color-light-text);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 400;
-    transition: all 0.15s ease-in-out;
+
+/* ========= Estructura de la Línea de Tiempo de Destinos ========= */
+.destinos-timeline {
     position: relative;
-    padding-bottom: 4px;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px;
 }
 
-nav ul li a::after {
+/* La línea vertical central */
+.destinos-timeline::after {
     content: '';
     position: absolute;
-    width: 0;
-    height: 1.5px;
-    background-color: var(--color-secondary);
+    width: 4px;
+    background-color: var(--dark-border-color);
+    top: 0;
     bottom: 0;
+    left: 50%;
+    margin-left: -2px;
+    border-radius: 2px;
+    z-index: 1;
+}
+
+.timeline-item {
+    padding: 20px 40px;
+    position: relative;
+    background-color: inherit;
+    width: 50%;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+}
+
+/* Alineación de los items a izquierda y derecha */
+.timeline-item:nth-child(odd) {
     left: 0;
-    transition: width 0.15s ease-in-out;
+    flex-direction: row-reverse; /* Imagen a la derecha, texto a la izquierda */
+    padding-left: 0;
 }
 
-nav ul li a:hover {
-    color: var(--color-secondary);
+.timeline-item:nth-child(even) {
+    left: 50%;
+    padding-right: 0;
 }
 
-nav ul li a:hover::after {
+/* El círculo en la línea de tiempo */
+.timeline-item::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    right: -10px;
+    background-color: var(--white-text);
+    border: 4px solid var(--sapphire-text-color);
+    top: 50%;
+    transform: translateY(-50%);
+    border-radius: 50%;
+    z-index: 2;
+}
+
+.timeline-item:nth-child(even)::after {
+    left: -10px;
+}
+
+/* Contenido de la tarjeta */
+.timeline-content, .timeline-img-container {
+    background-color: var(--container-bg);
+    padding: 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     width: 100%;
 }
 
-/* Estilo de la introducción */
-.intro-section {
-    text-align: center;
-    padding: 50px 4%;
-    background: linear-gradient(rgba(0, 0, 0, 0.5), var(--color-dark-bg) 80%), url('https://source.unsplash.com/random/1400x500/?peru,machupicchu,ancientruins') no-repeat center center/cover;
-    color: white;
-    margin-bottom: 40px;
-    box-shadow: inset 0 -5px 10px var(--color-shadow-light);
-    border-bottom: 0.5px solid var(--color-border);
+.timeline-item:hover .timeline-content,
+.timeline-item:hover .timeline-img-container {
+    transform: translateY(-10px);
+    box-shadow: var(--hover-shadow);
 }
 
-.intro-section .title {
-    font-family: var(--font-secondary);
-    font-size: 40px;
-    color: var(--color-primary);
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 5px var(--color-shadow-dark);
-    line-height: 1.2;
-    letter-spacing: 0.5px;
+.timeline-img-container {
+    padding: 0; /* Sin padding para que la imagen ocupe todo */
+    overflow: hidden; /* Asegura que la imagen no se salga de los bordes redondeados */
 }
 
-.intro-section .intro-text {
-    font-size: 16px;
-    max-width: 600px;
-    margin: 0 auto;
-    padding: 0 10px;
-    opacity: 0.85;
-    line-height: 1.5;
-    color: var(--color-lighter-text);
-}
-
-/* Estilo de los destinos */
-.destinos-section {
-    display: flex; /* Mantenemos flex para un diseño de columna de tarjetas */
-    flex-direction: column; /* Las tarjetas se apilan verticalmente */
-    gap: 25px;
-    padding: 0 3.5%;
-    margin-bottom: 50px;
-}
-
-.destino-card {
-    display: flex; /* ¡Aquí es donde la magia horizontal sucede! */
-    align-items: stretch; /* Asegura que la imagen y el contenido tengan la misma altura */
-    background-color: var(--color-medium-bg);
-    border-radius: var(--border-radius-md);
-    overflow: hidden;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease-in-out;
-    box-shadow: 0 3px 10px var(--color-shadow-light);
-    border: 0.5px solid var(--color-border);
-    /* Altura consistente para todas las tarjetas horizontales */
-    min-height: 200px; /* Suficiente para una imagen y contenido pequeño */
-    max-height: 250px; /* Límite para evitar tarjetas gigantes */
-}
-
-.destino-card.left {
-    flex-direction: row; /* Imagen a la izquierda, contenido a la derecha */
-}
-
-.destino-card.right {
-    flex-direction: row-reverse; /* Contenido a la izquierda, imagen a la derecha */
-}
-
-.destino-card:hover {
-    transform: translateY(-5px) scale(1.01);
-    box-shadow: 0px 8px 20px var(--color-shadow-dark);
-    border-color: var(--color-primary);
-}
-
-.image-container {
-    width: 40%; /* La imagen ocupa el 40% del ancho de la tarjeta */
-    flex-shrink: 0; /* Evita que la imagen se encoja */
-    height: 100%; /* La imagen ocupa la altura completa de la tarjeta */
-    overflow: hidden;
-    position: relative;
-    border-right: 0.5px solid var(--color-border); /* Borde sutil a la derecha de la imagen */
-}
-
-.destino-card.right .image-container {
-    border-left: 0.5px solid var(--color-border); /* Borde a la izquierda para el lado derecho */
-    border-right: none;
-}
-
-.destino-card img {
+.timeline-img-container img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Asegura que la imagen cubra sin distorsión */
-    transition: transform 0.3s ease-in-out;
+    object-fit: cover;
+    display: block;
 }
 
-.destino-card:hover img {
-    transform: scale(1.03);
+.timeline-content h3 {
+    color: var(--sapphire-text-color);
+    font-size: 1.8rem;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-weight: 600;
 }
 
-.card-content {
-    padding: 20px;
-    width: 60%; /* El contenido ocupa el 60% restante */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; /* Distribuye el espacio para título, texto y botón */
-    flex-grow: 1; /* Permite que el contenido crezca para llenar el espacio */
-    flex-shrink: 1; /* Permite que el contenido se encoja si es necesario */
+.timeline-content p {
+    margin-bottom: 10px;
 }
 
-.card-content h3 {
-    font-family: var(--font-secondary);
-    font-size: 20px;
-    color: var(--color-primary); /* ¡Título de tarjeta con el azul protagonista! */
-    margin-bottom: 8px;
-    text-shadow: none;
-    letter-spacing: 0.2px;
+.timeline-content p strong {
+    color: var(--text-color);
+    font-weight: 600;
 }
 
-.card-content p {
-    font-size: 14px;
-    line-height: 1.5;
-    color: var(--color-light-text);
-    margin-bottom: 12px;
-    /* Usamos 'flex-grow: 1' para que el párrafo ocupe el espacio disponible
-       y 'text-overflow: ellipsis' con 'overflow: hidden' para recortar si es demasiado largo */
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: 3; /* Limita el texto a 3 líneas */
-    -webkit-box-orient: vertical;
-}
-
-/* Botón de acción en la tarjeta */
-.card-content button {
-    background-color: var(--color-secondary);
-    color: var(--color-dark-bg);
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background-color 0.15s ease-in-out, transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    align-self: flex-start;
-    letter-spacing: 0.2px;
-    box-shadow: 0 2px 5px var(--color-shadow-light);
-}
-
-.card-content button:hover {
-    background-color: #08a9c2;
-    transform: translateY(-1px);
-    box-shadow: 0 3px 8px var(--color-shadow-dark);
-}
-
-/* Footer */
-footer {
-    text-align: center;
-    padding: 20px;
-    background-color: var(--color-medium-bg);
-    margin-top: 40px;
-    border-radius: var(--border-radius-md) var(--border-radius-md) 0 0;
-    border-top: 0.5px solid var(--color-border);
-    box-shadow: 0 -2px 8px var(--color-shadow-light);
-}
-
-footer p {
-    font-size: 14px;
-    color: var(--color-light-text);
-    opacity: 0.7;
-}
-
-/* Media Queries para Responsividad (ajustadas para el diseño horizontal) */
-@media (max-width: 1024px) {
-    body {
-        font-size: 14px;
+/* ========= Diseño Responsivo para Móviles ========= */
+@media screen and (max-width: 768px) {
+    .intro-header {
+        padding: 3rem 1rem;
+    }
+    .intro-header .title {
+        font-size: 2.2rem;
     }
 
-    header {
-        padding: 10px 3%;
+    /* La línea de tiempo se convierte en un bloque vertical */
+    .destinos-timeline::after {
+        left: 20px; /* Mueve la línea a la izquierda */
     }
 
-    nav ul {
-        gap: 15px;
-    }
-
-    nav ul li a {
-        font-size: 13px;
-    }
-
-    .intro-section .title {
-        font-size: 36px;
-    }
-
-    .intro-section .intro-text {
-        font-size: 15px;
-    }
-
-    .destino-card {
-        min-height: 180px; /* Altura un poco más pequeña en tablets */
-        max-height: 230px;
-    }
-
-    .image-container {
-        width: 35%; /* Imagen ligeramente más pequeña en tablets */
-    }
-
-    .card-content {
-        width: 65%;
-        padding: 18px;
-    }
-
-    .card-content h3 {
-        font-size: 18px;
-    }
-
-    .card-content p {
-        font-size: 13px;
-    }
-
-    .card-content button {
-        padding: 7px 14px;
-        font-size: 13px;
-    }
-}
-
-@media (max-width: 768px) {
-    header {
-        flex-direction: column;
-        padding: 10px 3%;
-    }
-
-    header .logo {
-        margin-bottom: 10px;
-        font-size: 20px;
-    }
-
-    nav ul {
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 8px;
-    }
-
-    nav ul li a {
-        font-size: 12px;
-    }
-
-    .intro-section {
-        padding: 35px 3%;
-    }
-
-    .intro-section .title {
-        font-size: 30px;
-    }
-
-    .intro-section .intro-text {
-        font-size: 14px;
-    }
-
-    /* ¡Las tarjetas se vuelven verticales en pantallas pequeñas para una mejor legibilidad! */
-    .destino-card {
-        flex-direction: column !important; /* Forzamos la dirección de columna */
-        min-height: unset; /* Quitamos alturas mínimas para adaptación */
-        max-height: unset;
-        align-items: center; /* Centramos el contenido apilado */
-    }
-
-    .image-container {
-        width: 100%; /* La imagen ocupa todo el ancho */
-        height: 180px; /* Altura fija para la imagen */
-        border-right: none; /* Quitamos bordes laterales */
-        border-bottom: 0.5px solid var(--color-border); /* Borde inferior para separar */
-    }
-    .destino-card.right .image-container { /* Aseguramos que solo tenga el borde inferior */
-        border-left: none;
-        border-bottom: 0.5px solid var(--color-border);
-    }
-
-    .card-content {
+    .timeline-item {
         width: 100%;
-        padding: 15px;
+        padding-left: 50px; /* Espacio para el contenido */
+        padding-right: 10px;
+        flex-direction: column; /* Apila imagen y texto */
+        align-items: flex-start;
+    }
+    
+    .timeline-item:nth-child(odd),
+    .timeline-item:nth-child(even) {
+        left: 0;
+        flex-direction: column; /* Apila imagen y texto */
+        align-items: flex-start;
     }
 
-    .card-content h3 {
-        font-size: 16px;
-    }
-
-    .card-content p {
-        font-size: 12px;
-        -webkit-line-clamp: unset; /* Permitimos que el texto se expanda más en móvil */
-    }
-
-    .card-content button {
-        width: 100%;
-        font-size: 12px;
-    }
-}
-
-@media (max-width: 480px) {
-    header .logo {
-        font-size: 18px;
-    }
-
-    nav ul {
-        gap: 6px;
-    }
-
-    nav ul li a {
-        font-size: 11px;
-    }
-
-    .intro-section .title {
-        font-size: 24px;
-    }
-
-    .intro-section .intro-text {
-        font-size: 13px;
-    }
-
-    .card-content h3 {
-        font-size: 14px;
-    }
-
-    .card-content p {
-        font-size: 11px;
+    .timeline-item::after {
+        left: 10px; /* Coloca el círculo sobre la línea */
     }
 }

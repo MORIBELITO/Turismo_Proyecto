@@ -3,319 +3,1011 @@
 {% block title %}{{ translate('Reseñas Turisticas') }}{% endblock %}
 {% block content %}
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles-reseñas.css') }}">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-</head>
+
+    <!-- Enlace a Leaflet CSS para el mapa -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Enlace a Font Awesome para los iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7WwQoQ5i0tqE0Lu/Qz2t0d0fW0d9b1c0z0/w+6wz9mR0fC3pPzXqJzXF2d5Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Estilos CSS Mejorados para Profesionalismo y Armonía -->
+<style>
+:root {
+    /* Colores base actuales */
+    --primary-color: #0d6efd;
+    --primary-hover: #0b5ed7;
+    --background-color: #f8f9fa; /* Este no se usará directamente para el fondo del contenedor principal */
+    --container-bg: #ffffff; /* Contenedor será blanco */
+    --text-color: #212529; /* Se redefinirá a zafiro */
+    --text-muted: #6c757d; /* Puede ajustarse para popups si es necesario */
+    --border-color: #dee2e6; /* Este se mantendrá para elementos que no cambian a los nuevos tonos */
+    --success-bg: #d1e7dd;
+    --success-text: #0f5132;
+    --error-bg: #f8d7da;
+    --error-text: #842029;
+    --warning-bg: #fff3cd;
+    --warning-text: #664d03;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --border-radius: 8px;
+    --star-color: #FFD700; /* Color amarillo oro para las estrellas */
+
+    /* Nuevos colores para el tema transparente/oscuro y el nuevo esquema */
+    /* Azul Zafiro con 80% de opacidad para el efecto translúcido */
+    --sapphire-blue-transparent: rgba(15, 82, 186, 0.8);
+    /* Tono más oscuro con 85% de opacidad para dropdowns */
+    --sapphire-darker-transparent: rgba(13, 71, 161, 0.85);
+
+    --sapphire-text-color: rgba(15, 82, 186, 0.8); /* Color principal del texto (medio transparente) */
+    --white-text: #FFFFFF; /* Para títulos y elementos destacados en fondos oscuros */
+    --light-text: #E0E0E0; /* Para texto secundario en fondos oscuros */
+    --hover-background-light: rgba(15, 82, 186, 0.08); /* Fondo al pasar el ratón para elementos en fondo blanco, ligeramente más visible */
+    --dark-border-color: rgba(15, 82, 186, 0.3); /* Borde con un toque de zafiro */
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', 'Roboto', sans-serif;
+    margin: 0;
+    padding: 10px;
+    /* Las propiedades de fondo se establecerán dinámicamente con JS */
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed; /* Para que el fondo no se desplace con el scroll */
+
+    color: var(--sapphire-text-color); /* Color de texto general */
+    min-height: 100vh;
+    position: relative; /* Necesario para que body::before se posicione correctamente */
+    z-index: 1; /* Asegura que el contenido del body esté sobre el pseudo-elemento */
+    overflow-x: hidden; /* Evitar scroll horizontal */
+
+    /* Scrollbar azul, gruesa pero fina */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: var(--primary-color) rgba(0,0,0,0.1); /* thumb and track */
+}
+
+/* Fondo borroso global con pseudo-elemento */
+body::before {
+    content: '';
+    position: fixed; /* Usar fixed para que cubra todo el viewport */
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    backdrop-filter: blur(5px); /* Desenfoque delicado */
+    background-color: rgba(0, 0, 0, 0.35); /* Capa oscura semi-transparente */
+    z-index: 0; /* Asegura que esté detrás del contenido del body */
+    animation: backgroundFadeIn 1.5s ease-out forwards;
+}
+
+@keyframes backgroundFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Scrollbar para navegadores Webkit */
+body::-webkit-scrollbar {
+    width: 10px; /* Ancho de la scrollbar */
+}
+
+body::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.1); /* Fondo de la pista */
+    border-radius: 5px;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color); /* Color del "thumb" (la parte que se arrastra) */
+    border-radius: 5px;
+    border: 2px solid transparent; /* Para que parezca "fina" pero tenga un poco de borde */
+    background-clip: padding-box; /* Asegura que el borde no oculte el color del thumb */
+}
+
+body::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-hover);
+}
+
+.contenedor {
+    background-color: var(--container-bg) !important; /* Contenedor principal blanco */
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+    display: flex;
+    max-width: 1400px;
+    width: 95%;
+    height: 82vh;
+    overflow: hidden;
+    border: 1px solid var(--dark-border-color); /* Borde zafiro */
+    margin: 25px auto;
+    margin-block-end: -10px;
+    animation: slideInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    opacity: 0;
+}
+
+@keyframes slideInUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#mapa {
+    height: 100%;
+    width: 60%;
+    border-right: 1px solid var(--dark-border-color); /* Borde zafiro */
+    animation: slideInLeft 0.7s ease-out forwards 0.2s;
+    opacity: 0;
+}
+
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.formulario {
+    padding: 20px;
+    width: 40%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    scroll-behavior: smooth;
+    scrollbar-gutter: stable;
+    animation: slideInRight 0.7s ease-out forwards 0.3s;
+    opacity: 0;
+    color: var(--sapphire-text-color); /* Texto del formulario */
+
+    /* Scrollbar para el formulario */
+    scrollbar-width: thin; /* Firefox */
+    scrollbar-color: var(--primary-color) rgba(0,0,0,0.05);
+}
+
+/* Scrollbar para navegadores Webkit dentro del formulario */
+.formulario::-webkit-scrollbar {
+    width: 10px;
+}
+
+.formulario::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.05);
+    border-radius: 5px;
+}
+
+.formulario::-webkit-scrollbar-thumb {
+    background-color: var(--primary-color);
+    border-radius: 5px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+}
+
+.formulario::-webkit-scrollbar-thumb:hover {
+    background-color: var(--primary-hover);
+}
+
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(50px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.formulario h2, .formulario h3 {
+    color: var(--sapphire-text-color); /* Títulos en zafiro */
+    border-bottom: 2px solid var(--sapphire-text-color); /* Borde zafiro */
+    padding-bottom: 8px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+    font-weight: 600;
+}
+
+.formulario form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.formulario label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+    color: var(--sapphire-text-color); /* Etiquetas en zafiro */
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.formulario label .fas {
+    transition: transform 0.3s ease;
+    color: var(--sapphire-text-color); /* Iconos de etiquetas en zafiro */
+}
+
+.formulario label:hover .fas {
+    transform: scale(1.15);
+    animation: bounceEffect 0.5s ease-in-out;
+}
+
+@keyframes bounceEffect {
+    0%, 100% { transform: scale(1.15); }
+    50% { transform: scale(1.25); }
+}
+
+.formulario input, .formulario textarea, .formulario select {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid var(--dark-border-color); /* Borde de los campos en zafiro */
+    border-radius: 4px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo de los campos: blanco semi-transparente */
+    color: var(--sapphire-text-color); /* Texto de los campos en zafiro */
+}
+
+.formulario input::placeholder, .formulario textarea::placeholder {
+    color: var(--sapphire-text-color); /* Color del placeholder en zafiro */
+    opacity: 0.7; /* Ligeramente más transparente */
+}
+
+.formulario input:hover,
+.formulario textarea:hover {
+    background-color: var(--hover-background-light); /* Fondo al pasar el ratón */
+    transform: scale(1.01);
+}
+
+.formulario input:focus, .formulario textarea:focus, .formulario select:focus {
+    outline: none;
+    border-color: var(--primary-color); /* Borde al enfocar en primary blue */
+    box-shadow: 0 0 0 3px rgba(13, 110, 253, 0.25); /* Sombra al enfocar con primary blue */
+    transform: scale(1.005);
+}
+
+.formulario input[readonly] {
+    background-color: rgba(15, 82, 186, 0.05); /* Color para campos readonly: zafiro muy claro */
+    cursor: not-allowed;
+}
+
+.formulario textarea {
+    resize: vertical;
+    min-height: 60px;
+    max-height: 80px;
+}
+
+.formulario button[type="submit"] {
+    background-color: rgba(15, 82, 186, 0.6); /* Azul zafiro transparente */
+    color: white; /* Texto blanco para mayor contraste */
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.formulario button[type="submit"]:hover {
+    background-color: rgba(13, 71, 161, 0.7); /* Zafiro más oscuro y ligeramente más opaco al pasar el ratón */
+    transform: translateY(-2px);
+}
+
+.formulario button[type="submit"] .fa-paper-plane {
+    transition: transform 0.3s ease-in-out;
+}
+
+.formulario button[type="submit"]:hover .fa-paper-plane {
+    transform: translateX(5px) rotate(5deg);
+}
+
+.formulario button:disabled {
+    background-color: #6c757d;
+    cursor: not-allowed;
+}
+
+.mensaje {
+    padding: 10px;
+    border-radius: 4px;
+    margin: 10px 0;
+    display: none;
+    text-align: center;
+    font-weight: 500;
+}
+
+.mensaje.exito { background-color: var(--success-bg); color: var(--success-text); }
+.mensaje.error { background-color: var(--error-bg); color: var(--error-text); }
+
+#login-prompt {
+    background-color: var(--warning-bg);
+    color: var(--warning-text);
+    padding: 10px;
+    border: 1px solid #ffecb5;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#login-prompt a {
+    color: var(--primary-color);
+    font-weight: bold;
+    text-decoration: none;
+    transition: transform 0.2s ease;
+}
+
+#login-prompt a:hover {
+    text-decoration: underline;
+    transform: translateX(2px);
+}
+
+.reseñas-anteriores {
+    margin-top: 6px;
+}
+
+.reseña-item {
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo transparente blanco para las tarjetas de reseña */
+    border: 1px solid var(--dark-border-color); /* Borde zafiro */
+    border-radius: var(--border-radius);
+    transition: box-shadow 0.3s ease, transform 0.2s ease, background-color 0.3s ease;
+    color: var(--sapphire-text-color); /* Texto de las reseñas en zafiro */
+}
+
+/* Animaciones de interacción para las tarjetas de reseña */
+.reseña-item:hover {
+    box-shadow: 0 2px 10px rgba(15, 82, 186, 0.2); /* Sombra más pronunciada al pasar el ratón, con color zafiro */
+    transform: translateY(-5px) scale(1.01); /* Elevación y ligero crecimiento */
+    background-color: var(--hover-background-light); /* Fondo al pasar el ratón */
+}
+
+.reseña-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.user-photo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.user-name {
+    font-weight: 600;
+    color: var(--sapphire-text-color); /* Nombre de usuario en zafiro */
+}
+
+.reseña-body {
+    color: var(--sapphire-text-color); /* Texto del cuerpo de la reseña en zafiro */
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.reseña-body strong {
+    color: var(--sapphire-text-color); /* Texto fuerte en zafiro */
+}
+
+.reseña-body small {
+    display: block;
+    margin-top: 8px;
+    font-style: italic;
+    color: var(--sapphire-text-color);
+    opacity: 0.8; /* Ligeramente más transparente */
+}
+
+/* Estrellas amarillas y animadas para reseñas */
+.estrellas {
+    color: var(--star-color);
+    margin-left: 5px;
+}
+
+.estrellas .fas.fa-star {
+    display: inline-block;
+    animation: starDance 1.5s ease-in-out infinite;
+    transform-origin: bottom;
+}
+
+.estrellas .fas.fa-star:nth-child(1) { animation-delay: 0s; }
+.estrellas .fas.fa-star:nth-child(2) { animation-delay: 0.1s; }
+.estrellas .fas.fa-star:nth-child(3) { animation-delay: 0.2s; }
+.estrellas .fas.fa-star:nth-child(4) { animation-delay: 0.3s; }
+.estrellas .fas.fa-star:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes starDance {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-3px) rotate(5deg); }
+    50% { transform: translateY(0) rotate(0deg); }
+    75% { transform: translateY(-3px) rotate(-5deg); }
+}
+
+.btn-toggle-reseñas {
+    background-color: rgba(15, 82, 186, 0.1); /* Fondo azul zafiro muy transparente */
+    color: var(--sapphire-text-color); /* Texto en zafiro medio transparente */
+    border: 1px solid rgba(15, 82, 186, 0.6); /* Borde azul zafiro medio transparente */
+    border-radius: 4px;
+    padding: 6px 10px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: none;
+}
+
+.btn-toggle-reseñas:hover {
+    background-color: rgba(15, 82, 186, 0.6); /* Fondo azul zafiro medio transparente al pasar el ratón */
+    color: white; /* Texto blanco al pasar el ratón */
+    transform: scale(1.02);
+}
+
+#rankingLugares {
+    list-style-type: none;
+    padding: 0;
+    /* Animación de entrada para el contenedor de ranking */
+    animation: fadeInSlideUp 0.8s ease-out forwards 0.9s; /* Ajustado el retraso */
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+@keyframes fadeInSlideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.ranking-item {
+    position: relative; /* Necesario para el posicionamiento absoluto del pseudo-elemento */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 6px;
+    padding-left: 45px; /* Más espacio para el icono de la copa, de 35px a 45px */
+    border-bottom: 1px solid var(--dark-border-color); /* Borde zafiro */
+    background-color: rgba(255, 255, 255, 0.8); /* Fondo transparente blanco para las tarjetas de ranking */
+    border-radius: var(--border-radius); /* Borde redondeado para consistencia */
+    margin-bottom: 10px; /* Margen inferior para separación */
+    transition: box-shadow 0.3s ease, transform 0.2s ease, background-color 0.3s ease, border-left 0.3s ease; /* Añadida transición para border-left */
+    color: var(--sapphire-text-color); /* Texto del ranking en zafiro */
+
+    /* Animación de entrada para cada item del ranking */
+    opacity: 0;
+    transform: translateY(20px);
+    animation: slideInRankingItem 0.6s ease-out forwards;
+}
+
+@keyframes slideInRankingItem {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Retrasos para la animación secuencial de los items del ranking */
+.ranking-item:nth-child(1) { animation-delay: 1.0s; }
+.ranking-item:nth-child(2) { animation-delay: 1.1s; }
+.ranking-item:nth-child(3) { animation-delay: 1.2s; }
+.ranking-item:nth-child(4) { animation-delay: 1.3s; }
+.ranking-item:nth-child(5) { animation-delay: 1.4s; }
+
+
+/* Estilos base para los iconos de copa */
+.ranking-item::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    font-size: 1.5em; /* Tamaño más pequeño para visibilidad */
+    top: 50%;
+    transform: translateY(-50%);
+    transition: transform 0.3s ease, font-size 0.3s ease;
+}
+
+/* Efecto hover para el icono de copa */
+.ranking-item:hover::before {
+    transform: translateY(-50%) scale(1.2); /* Efecto de "salto" al pasar el cursor */
+}
+
+/* Estilos específicos para cada tipo de copa */
+.ranking-item.gold::before {
+    content: '🥇'; /* Emoji de medalla de oro */
+}
+
+.ranking-item.silver::before {
+    content: '🥈'; /* Emoji de copa de plata */
+}
+
+.ranking-item.bronze::before {
+    content: '🥉'; /* Emoji de copa de bronce */
+}
+
+/* Resaltado visual para las 3 primeras posiciones - AHORA SOLO EN HOVER */
+.ranking-item.gold:hover {
+    border-left: 5px solid gold;
+    background-color: rgba(255, 215, 0, 0.15); /* Fondo ligeramente dorado, más visible */
+}
+.ranking-item.silver:hover {
+    border-left: 5px solid silver;
+    background-color: rgba(192, 192, 192, 0.15); /* Fondo ligeramente plateado, más visible */
+}
+.ranking-item.bronze:hover {
+    border-left: 5px solid #cd7f32;
+    background-color: rgba(205, 127, 50, 0.15); /* Fondo ligeramente bronce, más visible */
+}
+
+
+.ranking-item:hover {
+    background-color: var(--hover-background-light); /* Fondo al pasar el ratón, para todos los items */
+    transform: translateX(5px);
+    box-shadow: 0 4px 12px rgba(15, 82, 186, 0.1); /* Sombra sutil al pasar el cursor */
+}
+
+.ranking-item:last-child {
+    border-bottom: none;
+}
+
+.nombre-lugar {
+    flex-grow: 1;
+    color: var(--sapphire-text-color); /* Nombre del lugar en zafiro */
+    font-weight: 500;
+}
+
+.ranking-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Estrellas amarillas y animadas para el ranking */
+.ranking-stars-wrapper {
+    color: var(--star-color);
+}
+
+.ranking-star, .ranking-half-star, .ranking-star-empty {
+    font-size: 1.1em;
+    letter-spacing: 1px;
+    display: inline-block;
+}
+
+.ranking-star {
+    animation: starDance 1.5s ease-in-out infinite;
+    transform-origin: bottom;
+}
+
+/* Diferentes retrasos para un efecto de "baile" escalonado en el ranking (mantengo si se desea para interacción, no entrada) */
+.ranking-item:nth-child(1) .ranking-star:nth-child(1) { animation-delay: 0s; }
+.ranking-item:nth-child(1) .ranking-star:nth-child(2) { animation-delay: 0.05s; }
+.ranking-item:nth-child(1) .ranking-star:nth-child(3) { animation-delay: 0.1s; }
+.ranking-item:nth-child(2) .ranking-star:nth-child(1) { animation-delay: 0.1s; }
+.ranking-item:nth-child(2) .ranking-star:nth-child(2) { animation-delay: 0.15s; }
+.ranking-item:nth-child(3) .ranking-star:nth-child(1) { animation-delay: 0.2s; }
+/* ... y así sucesivamente para los demás items y estrellas */
+
+
+.ranking-star-empty {
+    color: rgba(15, 82, 186, 0.3); /* Estrellas vacías con un toque de zafiro */
+}
+
+.puntuacion-num {
+    font-weight: bold;
+    color: var(--sapphire-text-color); /* Puntuación numérica en zafiro */
+}
+
+/* Animaciones para el popup (siempre se activan cuando el popup aparece, no al cargar la página) */
+.popup-contenido h3 {
+    margin-top: 5px;
+    color: var(--primary-color);
+    animation: fadeInDown 0.4s ease-out forwards;
+}
+
+.popup-contenido p {
+    margin: 4px 0;
+    color: var(--text-muted); /* Mantengo text-muted para popups o reconsiderar color de popup */
+    font-size: 13px;
+    animation: fadeIn 0.5s ease-out forwards 0.1s;
+}
+
+.imagen-popup {
+    max-height: 120px;
+    width: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    animation: zoomIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    opacity: 0;
+    transform: scale(0.8);
+}
+
+@keyframes zoomIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+@media (min-height: 700px) {
+    .contenedor {
+        height: 90vh;
+    }
+}
+</style>
+
+<!-- El div `dynamic-background` ya no es necesario para el efecto de blur, se gestiona directamente en el body y su pseudo-elemento. -->
+<!-- <div id="dynamic-background" class="background-blur"></div> -->
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // La imagen de fondo ahora se aplica directamente al <body>
+        let imageUrl = 'https://consultasenlinea.mincetur.gob.pe/fichaInventario//foto.aspx?cod=569569'; // Ejemplo: Imagen aleatoria de Lorem Picsum
+
+        if (imageUrl) {
+            document.body.style.backgroundImage = `url('${imageUrl}')`;
+        }
+
+        // Para gestionar la animación de las estrellas cuando están en vista (si el contenido es desplazable)
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.querySelectorAll('.fas.fa-star').forEach(star => {
+                        star.style.animationPlayState = 'running';
+                    });
+                } else {
+                    entry.target.querySelectorAll('.fas.fa-star').forEach(star => {
+                        star.style.animationPlayState = 'paused';
+                    });
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.estrellas, .ranking-stars-wrapper').forEach(starContainer => {
+            observer.observe(starContainer);
+        });
+    });
+</script>
+
+
+
+
+
+
+
+
+
 <body>
-    <div class="contenedor">
+    <div class="contenedor">
 
-        <div id="mapa"></div>
+        <!-- Sección del Mapa Interactivo -->
+        <div id="mapa"></div>
 
-        <div class="formulario">
-            <h2>{{ translate('Formulario de Reseña') }}</h2>
-            <form id="formResena">
-                <label for="nombreLugar">{{ translate('Lugar:') }}</label>
-                <input type="text" id="nombreLugar" readonly />
+        <!-- Sección del Formulario de Reseña y Contenido Relacionado -->
+        <div class="formulario">
+            <h2><i class="fas fa-edit"></i> {{ translate('Formulario de Reseña') }}</h2>
 
-                <label for="visitas">{{ translate('Visitas:') }}</label>
-                <input type="number" id="visitas" readonly />
+            <div id="login-prompt" style="display: none;">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>{{ translate('Debes') }} <a href="{{ url_for('login') }}">{{ translate('iniciar sesión') }}</a> {{ translate('para dejar una reseña.') }}</span>
+            </div>
 
-                <label for="accesibles">{{ translate('Lugares accesibles:') }}</label>
-                <input type="number" id="accesibles" readonly />
+            <form id="formResena">
+                <div class="form-group">
+                    <label for="nombreLugar"><i class="fas fa-map-marker-alt"></i> {{ translate('Lugar:') }}</label>
+                    <input type="text" id="nombreLugar" readonly />
+                </div>
 
-                <label for="anio">{{ translate('Año:') }}</label>
-                <input type="number" id="anio" readonly />
+                <div class="form-group">
+                    <label for="visitas"><i class="fas fa-users"></i> {{ translate('Visitas:') }}</label>
+                    <input type="number" id="visitas" readonly />
+                </div>
 
-                <label for="accesibilidad">{{ translate('Accesibilidad:') }}</label>
-                <select id="accesibilidad" required>
-                    <option value="">{{ translate('Selecciona') }}</option>
-                    <option value="Baja">{{ translate('Baja') }}</option>
-                    <option value="Media">{{ translate('Media') }}</option>
-                    <option value="Alta">{{ translate('Alta') }}</option>
-                </select>
+                <div class="form-group">
+                    <label for="accesibles"><i class="fas fa-wheelchair"></i> {{ translate('Lugares accesibles:') }}</label>
+                    <input type="number" id="accesibles" readonly />
+                </div>
 
-                <label for="comentario">{{ translate('Comentario:') }}</label>
-                <textarea id="comentario" required minlength="5" placeholder="{{ translate('Escribe tu comentario aquí...') }}"></textarea>
+                <div class="form-group">
+                    <label for="anio"><i class="fas fa-calendar-alt"></i> {{ translate('Año:') }}</label>
+                    <input type="number" id="anio" readonly />
+                </div>
 
-                <button type="submit" id="btnEnviar">{{ translate('Enviar Reseña') }}</button>
-            </form>
+                <div class="form-group">
+                    <label for="accesibilidad"><i class="fas fa-star"></i> {{ translate('Calificación de Accesibilidad:') }}</label>
+                    <select id="accesibilidad" required>
+                        <option value="">{{ translate('Selecciona una calificación') }}</option>
+                        <option value="Baja">{{ translate('Baja') }}</option>
+                        <option value="Media">{{ translate('Media') }}</option>
+                        <option value="Alta">{{ translate('Alta') }}</option>
+                    </select>
+                </div>
 
-            <div id="mensaje" class="mensaje"></div>
-            <hr />
+                <div class="form-group">
+                    <label for="comentario"><i class="fas fa-comment-dots"></i> {{ translate('Comentario:') }}</label>
+                    <textarea id="comentario" required minlength="5" placeholder="{{ translate('Describe tu experiencia, enfocándote en la accesibilidad...') }}"></textarea>
+                </div>
 
-            <h3>{{ translate('Reseñas anteriores') }}</h3>
-            <div id="reseñasAnteriores" class="reseñas-anteriores"></div>
-            <button id="btnToggleReseñas" class="btn-toggle-reseñas">{{ translate('Mostrar más') }}</button>
+                <button type="submit" id="btnEnviar"><i class="fas fa-paper-plane"></i> {{ translate('Enviar Reseña') }}</button>
+            </form>
 
-            <h3>{{ translate('Ranking de lugares (según accesibilidad promedio)') }}</h3>
-            <ol id="rankingLugares"></ol>
-        </div>
-    </div>
+            <div id="mensaje" class="mensaje"></div>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+            <h3><i class="fas fa-history"></i> {{ translate('Reseñas Recientes') }}</h3>
+            <div id="reseñasAnteriores" class="reseñas-anteriores"></div>
+            <button id="btnToggleReseñas" class="btn-toggle-reseñas"><i class="fas fa-chevron-down"></i> {{ translate('Mostrar más') }}</button>
+            <hr style="border: none; border-top: 1px solid var(--border-color); margin: 20px 0;">
 
-    <script type="module">
-        // Firebase imports
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import {
-            getFirestore, collection, addDoc,
-            query, orderBy, onSnapshot
-        } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+            <h3><i class="fas fa-trophy"></i> {{ translate('Ranking de Lugares (por Accesibilidad)') }}</h3>
+            <ol id="rankingLugares"></ol>
+        </div>
+    </div>
 
-        // Configuración de Firebase
-        const firebaseConfig = {
-            apiKey: "TU_API_KEY", // ¡Asegúrate de reemplazar esto con tu clave API real!
-            authDomain: "turismo-4e958.firebaseapp.com",
-            projectId: "turismo-4e958",
-            storageBucket: "turismo-4e958.appspot.com",
-            messagingSenderId: "TU_MESSAGING_ID", // ¡Asegúrate de reemplazar esto con tu ID real!
-            appId: "TU_APP_ID" // ¡Asegúrate de reemplazar esto con tu ID real!
-        };
+    <!-- Script de Leaflet para el mapa -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    <!-- Tu script de Firebase y lógica de la aplicación (sin cambios) -->
+    <script type="module">
+        // Firebase imports
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-auth.js";
+        import {
+            getFirestore, collection, addDoc,
+            query, orderBy, onSnapshot
+        } from "https://www.gstatic.com/firebasejs/10.12.1/firebase-firestore.js";
 
-        // Datos de lugares turísticos
-        const lugares = {
-            "{{ translate('Huarihuilca') }}": {
-                coords: [-12.0825, -75.2105],
-                accesibles: 5,
-                anio: 2025,
-                imagen: "{{ url_for('static', filename='imagenes/huarihuilca.png') }}",
-                reseña: "{{ translate('Una antigua ciudadela andina con arquitectura impresionante.') }}"
-            },
-            "{{ translate('Cerrito La Libertad') }}": {
-                coords: [-12.0572, -75.2063],
-                accesibles: 3,
-                anio: 2025,
-                imagen: "{{ url_for('static', filename='imagenes/cerrito.jpg') }}",
-                reseña: "{{ translate('Un mirador que ofrece vistas panorámicas espectaculares.') }}"
-            },
-            "{{ translate('Iglesia Santo Cura de Ars') }}": {
-                coords: [-12.0612, -75.2045],
-                accesibles: 6,
-                anio: 2025,
-                imagen: "{{ url_for('static', filename='imagenes/iglesia.jpg') }}",
-                reseña: "{{ translate('Un lugar de culto con historia y belleza arquitectónica.') }}"
-            }
-        };
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyARMkC0EBYElA8wVOpefSgMD4oADAIqD4o",
+            authDomain: "turismo-4e958.firebaseapp.com",
+            projectId: "turismo-4e958",
+            storageBucket: "turismo-4e958.appspot.com",
+            messagingSenderId: "442508451378",
+            appId: "1:442508451378:web:65bed298dffe5b22e6262b",
+            measurementId: "G-XSDKJ73NKW"
+        };
 
-        // Inicializar mapa con Leaflet
-        const map = L.map('mapa').setView([-12.06, -75.2], 13);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        // Inicializar Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        let currentUser = null;
 
-        // Mostrar marcadores en el mapa
-        for (const [nombre, data] of Object.entries(lugares)) {
-            const marker = L.marker(data.coords).addTo(map);
-            marker.on("click", () => {
-                // Rellenar campos del formulario
-                document.getElementById("nombreLugar").value = nombre;
-                document.getElementById("visitas").value = Math.floor(Math.random() * (1750 - 1100 + 1)) + 1100;
-                document.getElementById("accesibles").value = data.accesibles;
-                document.getElementById("anio").value = data.anio;
+        onAuthStateChanged(auth, (user) => {
+            const form = document.getElementById('formResena');
+            const loginPrompt = document.getElementById('login-prompt');
 
-                // Mostrar popup
-                L.popup()
-                    .setLatLng(data.coords)
-                    .setContent(`
-                        <div class="popup-contenido">
-                            <img src="${data.imagen}" alt="${nombre}" class="imagen-popup" style="width:100%;max-width:200px;" />
-                            <h3>${nombre}</h3>
-                            <p>${data.reseña}</p>
-                            <p><strong>{{ translate('Año:') }}</strong> ${data.anio}</p>
-                            <p><strong>{{ translate('Lugares accesibles:') }}</strong> ${data.accesibles}</p>
-                        </div>
-                    `)
-                    .openOn(map);
-            });
-        }
+            if (user) {
+                currentUser = user;
+                loginPrompt.style.display = 'none';
+                Array.from(form.elements).forEach(el => el.disabled = false);
+            } else {
+                currentUser = null;
+                loginPrompt.style.display = 'flex'; // Cambiado a flex para alinear el icono
+                Array.from(form.elements).forEach(el => el.disabled = true);
+            }
+        });
 
-        // Envío del formulario
-        const btnEnviar = document.getElementById("btnEnviar");
-        const mensajeDiv = document.getElementById("mensaje");
+        // Datos de lugares turísticos
+        const lugares = {
+            "{{ translate('Huarihuilca') }}": { coords: [-12.0825, -75.2105], accesibles: 5, anio: 2025, imagen: "{{ url_for('static', filename='imagenes/huarihuilca.png') }}", reseña: "{{ translate('Una antigua ciudadela andina con arquitectura impresionante.') }}" },
+            "{{ translate('Cerrito La Libertad') }}": { coords: [-12.0572, -75.2063], accesibles: 3, anio: 2025, imagen: "{{ url_for('static', filename='imagenes/cerrito.jpg') }}", reseña: "{{ translate('Un mirador que ofrece vistas panorámicas espectaculares.') }}" },
+            "{{ translate('Iglesia Santo Cura de Ars') }}": { coords: [-12.0612, -75.2045], accesibles: 6, anio: 2025, imagen: "{{ url_for('static', filename='imagenes/iglesia.jpg') }}", reseña: "{{ translate('Un lugar de culto con historia y belleza arquitectónica.') }}" }
+        };
 
-        document.getElementById("formResena").addEventListener("submit", async (e) => {
-            e.preventDefault();
+        // Inicializar mapa con Leaflet
+        const map = L.map('mapa').setView([-12.06, -75.2], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-            const lugar = document.getElementById("nombreLugar").value.trim();
-            const accesibilidad = document.getElementById("accesibilidad").value;
-            const comentario = document.getElementById("comentario").value.trim();
+        // Mostrar marcadores en el mapa
+        for (const [nombre, data] of Object.entries(lugares)) {
+            const marker = L.marker(data.coords).addTo(map);
+            marker.on("click", () => {
+                document.getElementById("nombreLugar").value = nombre;
+                document.getElementById("visitas").value = Math.floor(Math.random() * (1750 - 1100 + 1)) + 1100;
+                document.getElementById("accesibles").value = data.accesibles;
+                document.getElementById("anio").value = data.anio;
+                L.popup()
+                    .setLatLng(data.coords)
+                    .setContent(`
+                        <div class="popup-contenido">
+                            <img src="${data.imagen}" alt="${nombre}" class="imagen-popup" />
+                            <h3>${nombre}</h3>
+                            <p>${data.reseña}</p>
+                            <p><strong>{{ translate('Año:') }}</strong> ${data.anio}</p>
+                            <p><strong>{{ translate('Lugares accesibles:') }}</strong> ${data.accesibles}</p>
+                        </div>
+                    `)
+                    .openOn(map);
+            });
+        }
 
-            if (!lugar || !accesibilidad || comentario.length < 5) {
-                mostrarMensaje("{{ translate('Completa todos los campos correctamente.') }}", "error");
-                return;
-            }
+        // Envío del formulario
+        const btnEnviar = document.getElementById("btnEnviar");
+        const mensajeDiv = document.getElementById("mensaje");
 
-            btnEnviar.disabled = true;
-            mostrarMensaje("", "");
+        document.getElementById("formResena").addEventListener("submit", async (e) => {
+            e.preventDefault();
 
-            const data = {
-                lugar,
-                visitas: parseInt(document.getElementById("visitas").value),
-                accesibles: parseInt(document.getElementById("accesibles").value),
-                anio: parseInt(document.getElementById("anio").value),
-                accesibilidad,
-                comentario,
-                fecha: new Date()
-            };
+            if (!currentUser) {
+                mostrarMensaje("{{ translate('Debes iniciar sesión para enviar una reseña.') }}", "error");
+                return;
+            }
 
-            try {
-                await addDoc(collection(db, "Reseñas"), data);
-                mostrarMensaje("{{ translate('Reseña enviada correctamente.') }}", "exito");
-                limpiarFormulario();
-            } catch (error) {
-                mostrarMensaje("{{ translate('Hubo un error al enviar la reseña.') }}", "error");
-            } finally {
-                btnEnviar.disabled = false;
-            }
-        });
+            const lugar = document.getElementById("nombreLugar").value.trim();
+            const accesibilidad = document.getElementById("accesibilidad").value;
+            const comentario = document.getElementById("comentario").value.trim();
 
-        // Mostrar mensaje
-        function mostrarMensaje(texto, tipo) {
-            mensajeDiv.textContent = texto;
-            mensajeDiv.className = "mensaje";
-            if (tipo) mensajeDiv.classList.add(tipo);
-            mensajeDiv.style.display = texto ? "block" : "none";
-        }
+            if (!lugar || !accesibilidad || comentario.length < 5) {
+                mostrarMensaje("{{ translate('Completa todos los campos correctamente.') }}", "error");
+                return;
+            }
 
-        // Limpiar campos del formulario
-        function limpiarFormulario() {
-            document.getElementById("formResena").reset();
-            ["nombreLugar", "visitas", "accesibles", "anio"].forEach(id => document.getElementById(id).value = "");
-        }
+            btnEnviar.disabled = true;
+            mostrarMensaje("", "");
 
-        // CONVERSIÓN DE ACCESIBILIDAD A ESTRELLAS HTML (FUNCIÓN MODIFICADA)
-        function renderEstrellas(cantidad) {
-            cantidad = Number(cantidad);
-            if (isNaN(cantidad) || cantidad < 0) cantidad = 0;
-            if (cantidad > 5) cantidad = 5;
+            const data = {
+                lugar,
+                visitas: parseInt(document.getElementById("visitas").value),
+                accesibles: parseInt(document.getElementById("accesibles").value),
+                anio: parseInt(document.getElementById("anio").value),
+                accesibilidad,
+                comentario,
+                fecha: new Date(),
+                userId: currentUser.uid,
+                userName: currentUser.displayName || currentUser.email,
+                userPhotoURL: currentUser.photoURL || "{{ url_for('static', filename='imagenes/default-user.jpg') }}" // Corregido: "default-user.jpg"
+            };
 
-            let estrellasHtml = '';
-            const filledStars = Math.floor(cantidad);
-            const hasHalfStar = (cantidad - filledStars) >= 0.5;
-            const emptyStars = 5 - filledStars - (hasHalfStar ? 1 : 0);
+            try {
+                await addDoc(collection(db, "Reseñas"), data);
+                mostrarMensaje("{{ translate('Reseña enviada correctamente. ¡Gracias por tu contribución!') }}", "exito");
+                limpiarFormulario();
+            } catch (error) {
+                mostrarMensaje("{{ translate('Hubo un error al enviar la reseña.') }}", "error");
+                console.error("Error al guardar reseña:", error);
+            } finally {
+                btnEnviar.disabled = false;
+            }
+        });
 
-            for (let i = 0; i < filledStars; i++) {
-                estrellasHtml += '<i class="ranking-star">★</i>'; // Clase para estrellas llenas
-            }
-            if (hasHalfStar) {
-                // Puedes usar una clase específica para media estrella si quieres un estilo diferente
-                // o un carácter unicode de media estrella si lo prefieres:
-                // estrellasHtml += '<i class="ranking-star">&#9733;&#xFE0E;</i>'; // Carácter unicode de media estrella
-                estrellasHtml += '<i class="ranking-star ranking-half-star">★</i>'; // Usar una estrella llena con clase para media
-            }
-            for (let i = 0; i < emptyStars; i++) {
-                estrellasHtml += '<i class="ranking-star-empty">☆</i>'; // Clase para estrellas vacías
-            }
-            return estrellasHtml;
-        }
+        function mostrarMensaje(texto, tipo) {
+            mensajeDiv.textContent = texto;
+            mensajeDiv.className = "mensaje";
+            if (tipo) mensajeDiv.classList.add(tipo);
+            if (texto) {
+                mensajeDiv.style.display = "block";
+            } else {
+                mensajeDiv.style.display = "none";
+            }
+        }
 
-        // Convertir valor textual de accesibilidad a número
-        function accesibilidadANumero(nivel) {
-            return nivel === "{{ translate('Baja') }}" ? 1 : nivel === "{{ translate('Media') }}" ? 3 : nivel === "{{ translate('Alta') }}" ? 5 : 0;
-        }
+        function limpiarFormulario() {
+            document.getElementById("formResena").reset();
+            ["nombreLugar", "visitas", "accesibles", "anio"].forEach(id => document.getElementById(id).value = "");
+        }
 
-        // Mostrar reseñas anteriores
-        function mostrarReseñas(reseñas) {
-            const reseñasDiv = document.getElementById("reseñasAnteriores");
-            const btnToggle = document.getElementById("btnToggleReseñas");
-            let mostrandoTodas = false;
+        function renderEstrellas(cantidad) {
+            cantidad = Number(cantidad);
+            if (isNaN(cantidad) || cantidad < 0) cantidad = 0;
+            if (cantidad > 5) cantidad = 5;
 
-            function render() {
-                reseñasDiv.innerHTML = "";
-                const mostrar = mostrandoTodas ? reseñas : reseñas.slice(0, 5);
+            let estrellasHtml = '';
+            const filledStars = Math.floor(cantidad);
+            const hasHalfStar = (cantidad - filledStars) >= 0.5;
+            const emptyStars = 5 - filledStars - (hasHalfStar ? 1 : 0);
 
-                mostrar.forEach(r => {
-                    const estrellasHtml = renderEstrellas(accesibilidadANumero(r.accesibilidad)); // USA LA FUNCIÓN MODIFICADA
-                    const div = document.createElement("div");
-                    div.className = "reseña-item";
-                    div.innerHTML = `
-                        <strong>{{ translate('Lugar:') }}</strong> ${r.lugar}<br/>
-                        <strong>{{ translate('Accesibilidad:') }}</strong> ${r.accesibilidad} <span class="estrellas">${estrellasHtml}</span><br/>
-                        <strong>{{ translate('Comentario:') }}</strong> ${r.comentario}<br/>
-                        <small>${new Date(r.fecha.seconds * 1000).toLocaleString()}</small>
-                    `;
-                    reseñasDiv.appendChild(div);
-                });
+            for (let i = 0; i < filledStars; i++) estrellasHtml += '<i class="ranking-star">★</i>';
+            if (hasHalfStar) estrellasHtml += '<i class="ranking-star ranking-half-star">★</i>';
+            for (let i = 0; i < emptyStars; i++) estrellasHtml += '<i class="ranking-star-empty">☆</i>';
+            return estrellasHtml;
+        }
 
-                btnToggle.textContent = mostrandoTodas ? "{{ translate('Mostrar menos') }}" : "{{ translate('Mostrar más') }}";
-                btnToggle.style.display = reseñas.length > 5 ? "block" : "none";
-            }
+        function accesibilidadANumero(nivel) {
+            return nivel === "{{ translate('Baja') }}" ? 1 : nivel === "{{ translate('Media') }}" ? 3 : nivel === "{{ translate('Alta') }}" ? 5 : 0;
+        }
 
-            btnToggle.onclick = () => {
-                mostrandoTodas = !mostrandoTodas;
-                render();
-            };
+        function mostrarReseñas(reseñas) {
+            const reseñasDiv = document.getElementById("reseñasAnteriores");
+            const btnToggle = document.getElementById("btnToggleReseñas");
+            let mostrandoTodas = false;
 
-            render();
-        }
+            function render() {
+                reseñasDiv.innerHTML = "";
+                const mostrar = mostrandoTodas ? reseñas : reseñas.slice(0, 3); // Mostrar 3 por defecto
 
-        // Mostrar ranking de lugares desde colección "Ranking"
-        function mostrarRankingDesdeColeccion() {
-            const rankingList = document.getElementById("rankingLugares");
-            const q = query(collection(db, "Ranking"));
+                mostrar.forEach(r => {
+                    const estrellasHtml = renderEstrellas(accesibilidadANumero(r.accesibilidad));
+                    const div = document.createElement("div");
+                    div.className = "reseña-item";
 
-            onSnapshot(q, (snapshot) => {
-                const items = snapshot.docs.map(doc => doc.data());
+                    // Aquí está la corrección: se usa 'default-user.jpg' para la foto de perfil predeterminada
+                    const defaultPhoto = "{{ url_for('static', filename='imagenes/default-user.jpg') }}"; // Corregido: "default-user.jpg"
+                    const userName = r.userName || "{{ translate('Usuario Anónimo') }}";
 
-                if (items.length === 0) {
-                    rankingList.innerHTML = "<li>{{ translate('No hay datos en el ranking aún.') }}</li>";
-                    return;
-                }
+                    div.innerHTML = `
+                        <div class="reseña-header">
+                            <img src="${r.userPhotoURL || defaultPhoto}" alt="Foto de ${userName}" class="user-photo">
+                            <span class="user-name">${userName}</span>
+                        </div>
+                        <div class="reseña-body">
+                            <strong>{{ translate('Lugar:') }}</strong> ${r.lugar}<br/>
+                            <strong>{{ translate('Calificación:') }}</strong> <span class="estrellas">${estrellasHtml}</span><br/>
+                            <strong>{{ translate('Comentario:') }}</strong> ${r.comentario}<br/>
+                            <small>${new Date(r.fecha.seconds * 1000).toLocaleString()}</small>
+                        </div>
+                    `;
+                    reseñasDiv.appendChild(div);
+                });
 
-                // Ordenar de mayor a menor según puntuacion_estrellas
-                const ordenados = items.sort((a, b) => b.puntuacion_estrellas - a.puntuacion_estrellas);
-                rankingList.innerHTML = "";
+                if (reseñas.length > 3) {
+                    btnToggle.style.display = "block";
+                    btnToggle.innerHTML = mostrandoTodas ? '<i class="fas fa-chevron-up"></i> {{ translate("Mostrar menos") }}' : '<i class="fas fa-chevron-down"></i> {{ translate("Mostrar más") }}';
+                } else {
+                    btnToggle.style.display = "none";
+                }
+            }
 
-                ordenados.forEach(item => {
-                    const estrellasHtml = renderEstrellas(item.puntuacion_estrellas); // USA LA FUNCIÓN MODIFICADA
+            btnToggle.onclick = () => {
+                mostrandoTodas = !mostrandoTodas;
+                render();
+            };
+            render();
+        }
 
-                    const li = document.createElement("li");
-                    li.className = "ranking-item"; // Para estilos flexbox en CSS
+        function mostrarRankingDesdeColeccion() {
+            const rankingList = document.getElementById("rankingLugares");
+            const q = query(collection(db, "Ranking"));
 
-                    // Nombre del lugar
-                    const nombreLugarSpan = document.createElement("span");
-                    nombreLugarSpan.className = "nombre-lugar";
-                    nombreLugarSpan.textContent = item.lugar;
+            onSnapshot(q, (snapshot) => {
+                const items = snapshot.docs.map(doc => doc.data());
 
-                    // Contenedor de estrellas y puntuación
-                    const rankingInfoSpan = document.createElement("span");
-                    rankingInfoSpan.className = "ranking-info";
+                if (items.length === 0) {
+                    rankingList.innerHTML = "<li>{{ translate('No hay datos en el ranking aún.') }}</li>";
+                    return;
+                }
 
-                    const estrellasSpan = document.createElement("span");
-                    estrellasSpan.className = "ranking-stars-wrapper"; // Nueva clase para el contenedor de estrellas del ranking
-                    estrellasSpan.innerHTML = estrellasHtml; // Aquí se inyecta el HTML
+                const ordenados = items.sort((a, b) => b.puntuacion_estrellas - a.puntuacion_estrellas);
+                rankingList.innerHTML = "";
 
-                    const puntuacionText = document.createElement("span");
-                    puntuacionText.className = "puntuacion-num";
-                    puntuacionText.textContent = ` ${item.puntuacion_estrellas.toFixed(1)}`;
+                ordenados.forEach((item, index) => { // Añadido 'index' para identificar la posición
+                    const estrellasHtml = renderEstrellas(item.puntuacion_estrellas);
+                    const li = document.createElement("li");
+                    li.className = "ranking-item";
 
-                    // Ensamblar
-                    rankingInfoSpan.appendChild(estrellasSpan);
-                    rankingInfoSpan.appendChild(puntuacionText);
+                    // Añadir clases para las copas según la posición
+                    if (index === 0) {
+                        li.classList.add('gold');
+                    } else if (index === 1) {
+                        li.classList.add('silver');
+                    } else if (index === 2) {
+                        li.classList.add('bronze');
+                    }
 
-                    li.appendChild(nombreLugarSpan);
-                    li.appendChild(rankingInfoSpan);
-                    rankingList.appendChild(li);
-                });
-            });
-        }
+                    li.innerHTML = `
+                        <span class="nombre-lugar">${item.lugar}</span>
+                        <span class="ranking-info">
+                            <span class="ranking-stars-wrapper">${estrellasHtml}</span>
+                            <span class="puntuacion-num">${item.puntuacion_estrellas.toFixed(1)}</span>
+                        </span>
+                    `;
+                    rankingList.appendChild(li);
+                });
+            });
+        }
 
-        // Inicializar escuchas en Firestore
-        function inicializarEscuchas() {
-            const q = query(collection(db, "Reseñas"), orderBy("fecha", "desc"));
-            onSnapshot(q, (snapshot) => {
-                const datos = snapshot.docs.map(doc => doc.data());
-                mostrarReseñas(datos);
-            });
+        function inicializarEscuchas() {
+            const q = query(collection(db, "Reseñas"), orderBy("fecha", "desc"));
+            onSnapshot(q, (snapshot) => {
+                const datos = snapshot.docs.map(doc => doc.data());
+                mostrarReseñas(datos);
+            });
 
-            mostrarRankingDesdeColeccion();
-        }
+            mostrarRankingDesdeColeccion();
+        }
 
-        // Ejecutar funciones al cargar
-        inicializarEscuchas();
-    </script>
+        inicializarEscuchas();
+    </script>
 </body>
 </html>
+
+
 {% endblock %}

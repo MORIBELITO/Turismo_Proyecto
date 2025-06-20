@@ -4,8 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Web Turismo - Login / Registro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" xintegrity="sha512-Fo3rljxXtqP0s/bVq8+7N2yL1t/eD1K/0/3e+fL3i8j/bN5jW1+K1z/1W4g+7K+A6e+bF/4w==" crossorigin="anonymous" referrerpolicy="no-referrer" />
   <link rel="stylesheet" href="{{ url_for('static', filename='styles-login.css') }}">
   <style>
+    /* Este CSS en línea puede ser movido a styles-login.css para una mejor organización */
     .google-button {
       display: flex;
       align-items: center;
@@ -31,6 +33,16 @@
 
     footer {
       display: none;
+    }
+    /* Estilos corregidos para los textos de registro/login */
+    #showRegister,
+    #showLogin {
+        /* Se mantiene display, position, margin-top, font-weight, font-size,
+           cursor, user-select, padding, z-index, line-height, transition, white-space
+           del CSS externo.
+           Solo se añade text-decoration aquí para asegurar que aparezca subrayado.
+           El color ya se gestiona por el CSS externo con !important */
+        text-decoration: underline; /* Agregado para asegurar el subrayado */
     }
   </style>
 </head>
@@ -61,9 +73,10 @@
         <p id="loginErrorMsg" style="color: red; margin-top: 10px;"></p>
       </form>
 
-      <p style="color: white; margin-top: 15px; text-align: center;">
+      <!-- SE CAMBIÓ AQUÍ: ELIMINADO style="color: white;" -->
+      <p style="margin-top: 15px; text-align: center;">
         ¿No tienes una cuenta?
-        <span id="showRegister" style="color: orange; cursor: pointer; font-weight: bold; text-decoration: underline;">
+        <span id="showRegister">
           Registrarse
         </span>
       </p>
@@ -85,9 +98,10 @@
         <button type="submit">Crear Cuenta</button>
         <p id="registerErrorMsg" style="color: red; margin-top: 10px;"></p>
       </form>
-      <p style="color: white; margin-top: 15px; text-align: center;">
+      <!-- SE CAMBIÓ AQUÍ: ELIMINADO style="color: white;" -->
+      <p style="margin-top: 15px; text-align: center;">
         ¿Ya tienes cuenta?
-        <span id="showLogin" style="color: orange; cursor: pointer; font-weight: bold; text-decoration: underline;">
+        <span id="showLogin">
           Iniciar sesión
         </span>
       </p>
@@ -165,7 +179,10 @@
         })
         .catch((error) => {
           console.error("Error al iniciar sesión con Google:", error);
-          alert("Error al iniciar sesión con Google: " + error.message);
+          // Usar una modal en lugar de alert
+          const errorMessage = "Error al iniciar sesión con Google: " + error.message;
+          // Implementar aquí la lógica para mostrar un mensaje en la UI, por ejemplo, un div temporal.
+          console.error(errorMessage); // Para depuración
         });
     });
 
@@ -179,7 +196,10 @@
         })
         .catch((error) => {
           console.error("Error al registrarse con Google:", error);
-          alert("Error al registrarse con Google: " + error.message);
+          // Usar una modal en lugar de alert
+          const errorMessage = "Error al registrarse con Google: " + error.message;
+          // Implementar aquí la lógica para mostrar un mensaje en la UI, por ejemplo, un div temporal.
+          console.error(errorMessage); // Para depuración
         });
     });
 
