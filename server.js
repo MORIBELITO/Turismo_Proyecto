@@ -16,7 +16,7 @@ app.use(express.static(__dirname));
 app.get('/', (req, res) => {
     // __dirname es la ruta absoluta al directorio donde se encuentra este script (server.js).
     // path.join() construye una ruta segura para el archivo index.html.
-    res.sendFile(path.join(__dirname, 'login.html'));
+    res.sendFile(path.join(__dirname, 'turismo.py'));
 });
 
 // Inicia el servidor y lo pone a escuchar en el puerto definido.
