@@ -1,0 +1,13 @@
+{
+    "name": "confianza-micro-app",
+    "version": "1.0.0",
+    "description": "Un servidor de archivos estáticos simple para ConfianzaMicro en Railway.",
+    "main": "server.js", 
+    "scripts": {
+      "start": "node server.js" 
+    },
+    "dependencies": {
+      "express": "^4.19.2" 
+    }
+  }
+  
